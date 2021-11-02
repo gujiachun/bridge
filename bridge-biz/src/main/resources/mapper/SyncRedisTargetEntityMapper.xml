@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainbow.bridge.biz.mapper.SyncRedisTargetMapper">
+
+    <select id="query"
+            resultType="com.rainbow.bridge.biz.dto.RedisTargetDto">
+        SELECT
+        sync_redis_target.id AS id,
+        sync_redis_target.mode AS mode,
+        sync_redis_target.props AS props,
+        sync_redis_target.target_id AS targetId,
+        sync_redis_target.created_time AS createdTime,
+        sync_redis_target.updated_time AS updatedTime,
+        sync_target.name AS name,
+        sync_target.remark AS remark,
+        sync_target.env AS env,
+        sync_target.type AS type
+        FROM sync_redis_target inner join sync_target on sync_redis_target.target_id = sync_target.id
+        WHERE 1 = 1
+        <if test="model.env != null and model.env !=''">
+            AND #{model.env} = sync_target.env
+        </if>
+        <if test="model.name != null and model.name !=''">
+            AND sync_target.name like concat('%',#{model.name},'%')
+        </if>
+        ORDER BY sync_redis_target.created_time asc
+    </select>
+
+</mapper>

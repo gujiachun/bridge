@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainbow.bridge.biz.mapper.SyncMysqlTargetMapper">
+
+    <select id="query"
+            resultType="com.rainbow.bridge.biz.dto.MysqlTargetDto">
+        SELECT
+        sync_mysql_target.id AS id,
+        sync_mysql_target.db_name AS dbName,
+        sync_mysql_target.props AS props,
+        sync_mysql_target.target_id AS targetId,
+        sync_mysql_target.created_time AS createdTime,
+        sync_mysql_target.updated_time AS updatedTime,
+        sync_target.name AS name,
+        sync_target.remark AS remark,
+        sync_target.env AS env,
+        sync_target.type AS type
+        FROM sync_mysql_target inner join sync_target on sync_mysql_target.target_id = sync_target.id
+        WHERE 1 = 1
+        <if test="model.env != null and model.env !=''">
+            AND #{model.env} = sync_target.env
+        </if>
+        <if test="model.name != null and model.name !=''">
+            AND sync_target.name like concat('%',#{model.name},'%')
+        </if>
+        ORDER BY sync_mysql_target.created_time asc
+    </select>
+
+</mapper>

@@ -1,23 +1,52 @@
-# Compiled class file
-*.class
+Thumbs.db
+.project   
+.classpath
+.evosuite/
+.settings/
+.idea/
+bin/
+target/
+*.class  
+*.log   
+*.bak   
+*.tmp
+*.swp
+*.orig
+*.iml
 
-# Log file
-*.log
+out
+gen
+target
+logs
+LOG_PATH_IS_UNDEFINEDdaily
+LOG_PATH_IS_UNDEFINEDLOG_FILE_IS_UNDEFINED
+*.prefs
+org.eclipse.wst.common.project.facet.core.xml
+.project
+.classpath
 
-# BlueJ files
-*.ctxt
+.factorypath
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+.DS_Store
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+**/*.log
 
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+tests/**/coverage/
+tests/e2e/reports
+selenium-debug.log
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.local
+
+package-lock.json
+yarn.lock

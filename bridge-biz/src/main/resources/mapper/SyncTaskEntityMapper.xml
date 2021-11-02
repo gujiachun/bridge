@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainbow.bridge.biz.mapper.SyncTaskMapper">
+
+    <select id="query"
+            resultType="com.rainbow.bridge.biz.dto.TaskBizDto">
+        SELECT
+        sync_task.id AS id,
+        sync_task.publish_cluster AS publishCluster,
+        sync_task.target_type AS targetType,
+        sync_task.basic_topic_id AS basicTopicId,
+        sync_task.created_time AS createdTime,
+        sync_task.updated_time AS updatedTime,
+        sync_task.name AS name,
+        sync_task.async AS async,
+        sync_task.status AS status,
+        sync_task.env AS env,
+        sync_task.instance_count AS instanceCount,
+        basic_topic.topic AS topic,
+        basic_mq.name AS mqName,
+        basic_cluster.name AS clusterName
+        FROM sync_task
+            inner join basic_topic on sync_task.basic_topic_id = basic_topic.id
+            inner join basic_mq on basic_topic.mq_id = basic_mq.id
+            inner join basic_cluster on sync_task.publish_cluster = basic_cluster.code
+        WHERE 1 = 1
+        <if test="model.env != null and model.env !=''">
+            AND #{model.env} = sync_task.env
+        </if>
+        <if test="model.targetType != null and model.targetType !=''">
+            AND sync_task.target_type = #{model.targetType}
+        </if>
+        <if test="model.status != null and model.status != -1">
+            AND sync_task.status = #{model.status}
+        </if>
+        <if test="model.name != null and model.name !=''">
+            AND sync_task.name like concat('%',#{model.name},'%')
+        </if>
+        ORDER BY sync_task.created_time desc
+    </select>
+
+</mapper>

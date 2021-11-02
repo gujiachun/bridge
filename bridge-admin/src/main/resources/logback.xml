@@ -1,0 +1,89 @@
+<configuration scan="true" scanPeriod=" 5 seconds">
+	<jmxConfigurator />
+    <property name="ROLL_FILE_NAME" value="bridge-admin"/>
+    <property name="ROLL_LOG_PATH" value="../logs/${ROLL_FILE_NAME}"/>
+    <property name="FILE_ENCODING" value="UTF-8"/>
+    <property name="FILE_LOG_PATTERN"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{56} %msg%n"/>
+
+    <!--控制台日志输出格式-->
+    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
+    <!--控制台输出-->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+
+	<appender name="FILE_TIMEROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${ROLL_LOG_PATH}/${ROLL_FILE_NAME}.log</file>
+        <prudent>false</prudent>
+        <append>true</append>
+        <encoder>
+            <charset>${FILE_ENCODING}</charset>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${ROLL_LOG_PATH}/${ROLL_FILE_NAME}_%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!--文件达到 最大1024MB时会被压缩和切割 -->
+                <maxFileSize>1024MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="FILE_TIMEROLLING_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${ROLL_LOG_PATH}/${ROLL_FILE_NAME}_error.log</file>
+        <prudent>false</prudent>
+        <append>true</append>
+        <encoder>
+            <charset>${FILE_ENCODING}</charset>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${ROLL_LOG_PATH}/${ROLL_FILE_NAME}_error_%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!--文件达到 最大1024MB时会被压缩和切割 -->
+                <maxFileSize>1024MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+	<!-- 异步输出 -->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="FILE_TIMEROLLING"/>
+    </appender>
+
+    <!-- 异步输出 -->
+    <appender name="ASYNC_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref="FILE_TIMEROLLING_ERROR"/>
+    </appender>
+
+    <appender name="CONSOLE_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+	<root level="INFO">
+        <appender-ref ref="CONSOLE_STDOUT"/>
+        <appender-ref ref="ASYNC"/>
+        <appender-ref ref="ASYNC_ERROR"/>
+    </root>
+</configuration>

@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.rainbow.bridge.web.config.FastJsonMessageConverterConfig,\
+com.rainbow.bridge.web.config.WebConfig,\
+com.rainbow.bridge.web.handler.GlobalExceptionAdvice
