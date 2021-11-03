@@ -44,7 +44,7 @@
 
 ## 架构
 
-![https://gitee.com/gujiachun/redis-plus/blob/master/彩虹桥架构图.png](https://gitee.com/gujiachun/redis-plus/blob/master/彩虹桥架构图.png)
+![架构图](https://gitee.com/gujiachun/redis-plus/blob/master/彩虹桥架构图.png)
 
 彩虹桥（rainbow bridge）可以理解为canal的**客户端平台**，以任务的方式执行业务需求，***为了保证高可用、负载均衡，引入了集群设计以及zookeeper做实例协调***。
 
