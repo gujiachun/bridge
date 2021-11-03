@@ -19,10 +19,10 @@
           <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
+          <a target="_blank" href="https://gitee.com/gujiachun/bridge">
             <el-dropdown-item>码云</el-dropdown-item>
           </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
+          <a target="_blank" href="https://gitee.com/gujiachun/bridge/blob/master/README.md">
             <el-dropdown-item>文档</el-dropdown-item>
           </a>
           <el-dropdown-item divided @click.native="logout">
