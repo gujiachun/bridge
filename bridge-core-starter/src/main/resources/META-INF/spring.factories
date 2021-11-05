@@ -1,2 +1,0 @@
-#org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-#com.rainbow.bridge.core.config.ZkAutoConfig

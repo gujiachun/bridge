@@ -11,9 +11,7 @@
     <modules>
         <module>bridge-core</module>
         <module>bridge-web-starter</module>
-        <module>bridge-core-starter</module>
         <module>bridge-canal-client</module>
-        <module>bridge-canal-client-starter</module>
         <module>bridge-biz</module>
         <module>bridge-server</module>
         <module>bridge-admin</module>
