@@ -4,15 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.rainbow.bridge.biz.dto.MysqlTargetDto;
 import com.rainbow.bridge.biz.dto.RedisTargetDto;
 import com.rainbow.bridge.biz.dto.query.TargetQueryDto;
-import com.rainbow.bridge.biz.entity.SyncMysqlTargetEntity;
 import com.rainbow.bridge.biz.entity.SyncRedisTargetEntity;
 import com.rainbow.bridge.biz.entity.SyncTargetEntity;
-import com.rainbow.bridge.biz.mapper.SyncMysqlTargetMapper;
 import com.rainbow.bridge.biz.mapper.SyncRedisTargetMapper;
-import com.rainbow.bridge.biz.service.MysqlTargetService;
 import com.rainbow.bridge.biz.service.RedisTargetService;
 import com.rainbow.bridge.biz.service.TargetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +38,7 @@ public class RedisTargetServiceImpl extends ServiceImpl<SyncRedisTargetMapper, S
     @Override
     public IPage<RedisTargetDto> query(TargetQueryDto targetQueryDto) {
         IPage<RedisTargetDto> page = new Page<>(targetQueryDto.getCurrentPage(), targetQueryDto.getPageSize());
-        return baseMapper.query(page, targetQueryDto);
+        return baseMapper.queryRedisTarget(page, targetQueryDto);
     }
 
     @Transactional(rollbackFor = Exception.class)

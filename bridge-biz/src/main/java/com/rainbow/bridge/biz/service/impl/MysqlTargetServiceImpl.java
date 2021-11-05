@@ -8,15 +8,12 @@ import com.rainbow.bridge.biz.dto.MysqlTargetDto;
 import com.rainbow.bridge.biz.dto.query.TargetQueryDto;
 import com.rainbow.bridge.biz.entity.*;
 import com.rainbow.bridge.biz.mapper.SyncMysqlTargetMapper;
-import com.rainbow.bridge.biz.mapper.SyncTaskMapper;
 import com.rainbow.bridge.biz.service.*;
-import com.rainbow.bridge.core.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author gujiachun
@@ -39,7 +36,7 @@ public class MysqlTargetServiceImpl extends ServiceImpl<SyncMysqlTargetMapper, S
     @Override
     public IPage<MysqlTargetDto> query(TargetQueryDto targetQueryDto) {
         IPage<MysqlTargetDto> page = new Page<>(targetQueryDto.getCurrentPage(), targetQueryDto.getPageSize());
-        return baseMapper.query(page, targetQueryDto);
+        return baseMapper.queryMysqlTarget(page, targetQueryDto);
     }
 
     @Transactional(rollbackFor = Exception.class)

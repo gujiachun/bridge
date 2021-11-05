@@ -17,5 +17,5 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface SyncMysqlTargetMapper extends BaseMapper<SyncMysqlTargetEntity> {
 
-    IPage<MysqlTargetDto> query(IPage<MysqlTargetDto> page, @Param("model") TargetQueryDto targetQueryDto);
+    IPage<MysqlTargetDto> queryMysqlTarget(IPage<MysqlTargetDto> page, @Param("model") TargetQueryDto targetQueryDto);
 }

@@ -21,5 +21,5 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface SyncRedisTargetMapper extends BaseMapper<SyncRedisTargetEntity> {
 
-    IPage<RedisTargetDto> query(IPage<RedisTargetDto> page, @Param("model") TargetQueryDto targetQueryDto);
+    IPage<RedisTargetDto> queryRedisTarget(IPage<RedisTargetDto> page, @Param("model") TargetQueryDto targetQueryDto);
 }

@@ -161,12 +161,11 @@
                                     <overwrite>true</overwrite>
                                     <resources>
                                         <resource>
-                                            <directory>${project.parent.basedir}/bridge-admin-ui/target/dist</directory>
+                                            <directory>${project.parent.basedir}/bridge-admin-ui/dist</directory>
                                             <includes>
                                                 <include>static/</include>
                                                 <include>index.html</include>
-                                                <include>avatar.gif</include>
-                                                <include>logo.png</include>
+                                                <include>favicon.ico</include>
                                             </includes>
                                         </resource>
                                     </resources>

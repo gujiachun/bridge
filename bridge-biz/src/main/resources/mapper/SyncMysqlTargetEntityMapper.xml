@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rainbow.bridge.biz.mapper.SyncMysqlTargetMapper">
 
-    <select id="query"
+    <select id="queryMysqlTarget"
             resultType="com.rainbow.bridge.biz.dto.MysqlTargetDto">
         SELECT
         sync_mysql_target.id AS id,

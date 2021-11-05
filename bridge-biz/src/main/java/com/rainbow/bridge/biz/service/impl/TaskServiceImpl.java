@@ -3,7 +3,6 @@ package com.rainbow.bridge.biz.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.rainbow.bridge.biz.dto.MysqlTargetDto;
 import com.rainbow.bridge.biz.dto.TaskBizDto;
 import com.rainbow.bridge.biz.dto.query.TaskQueryDto;
 import com.rainbow.bridge.biz.entity.BasicMqEntity;
@@ -47,7 +46,7 @@ public class TaskServiceImpl extends ServiceImpl<SyncTaskMapper, SyncTaskEntity>
     @Override
     public IPage<TaskBizDto> query(TaskQueryDto taskQueryDto) {
         IPage<TaskBizDto> page = new Page<>(taskQueryDto.getCurrentPage(), taskQueryDto.getPageSize());
-        return baseMapper.query(page,taskQueryDto);
+        return baseMapper.queryTask(page,taskQueryDto);
     }
 
 

@@ -16,5 +16,5 @@ import org.apache.ibatis.annotations.Param;
  * @since 2021-09-27
  */
 public interface SyncTaskMapper extends BaseMapper<SyncTaskEntity> {
-    IPage<TaskBizDto> query(IPage<TaskBizDto> page, @Param("model") TaskQueryDto taskQueryDto);
+    IPage<TaskBizDto> queryTask(IPage<TaskBizDto> page, @Param("model") TaskQueryDto taskQueryDto);
 }

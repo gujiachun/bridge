@@ -16,7 +16,7 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
+          <a target="_blank" href="https://github.com/gujiachun/bridge.git">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
           <a target="_blank" href="https://gitee.com/gujiachun/bridge">

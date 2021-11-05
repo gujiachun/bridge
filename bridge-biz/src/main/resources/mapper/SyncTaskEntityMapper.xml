@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rainbow.bridge.biz.mapper.SyncTaskMapper">
 
-    <select id="query"
+    <select id="queryTask"
             resultType="com.rainbow.bridge.biz.dto.TaskBizDto">
         SELECT
         sync_task.id AS id,
