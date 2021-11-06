@@ -22,7 +22,7 @@
 
 ### ES同步
 
-在有些复杂查询场景中，有时候我们需要把mysql中的数据同步到es中，那我们如何方便有效的进行同步呢？
+在有些复杂查询场景中，我们会用到elasticsearch做搜索引擎，es中的数据绝大多数是从mysql来的，那么我们就需要把mysql中的数据同步到es中，那我们如何方便有效的进行同步呢？能否不需要写代码，也能实现业务的自定义同步呢？
 
 ## 目标
 
@@ -37,7 +37,7 @@
 
 3、任务在线实时更新，无须重启任务实例
 
-4、实例执行任务自动伸缩
+4、实例执行任务自动伸缩，自动抢购任务
 
 5、任务执行方式支持同步、异步
 
@@ -48,7 +48,7 @@
 
 ## 架构
 
-![架构图](https://p.ampmake.com/fed/image/png/20ad30cfc4e6a724884624b9cbdce246.png)
+![架构图](/Users/gujiachun/Downloads/架构图V1.png)
 
 彩虹桥（rainbow bridge）可以理解为canal的**客户端平台**，以任务的方式执行业务需求，***为了保证高可用、负载均衡，引入了集群设计以及zookeeper做实例协调***。
 
@@ -56,12 +56,12 @@
 
 彩虹桥部署需要准备
 
-| 序号 | 组件                 | 描述                                                         | 被谁依赖                                        |
-| :--: | -------------------- | ------------------------------------------------------------ | ----------------------------------------------- |
-|  1   | mysql 5.x            | 用来存储整个系统的数据，任务、目标源等信息                   | 全局依赖                                        |
-|  2   | zookeeper 3.6.2      | 用来协调bridge-server实例，以及每个实例要处理的任务数量；通过zk达到高可用，负载均衡 | bridge-server服务依赖zk；bridge-admin服务依赖zk |
-|  3   | bridge-admin.tar.gz  | 彩虹桥的管理后台，维护目标源，以及任务等数据                 |                                                 |
-|  4   | Bridge-server.tar.gz | 用来处理任务，同步数据到目标源                               |                                                 |
+| 序号 | 组件                 | 描述                                                         | 依赖关系      |
+| :--: | -------------------- | ------------------------------------------------------------ | ------------- |
+|  1   | mysql 5.x            | 用来存储整个系统的数据，任务、目标源等信息                   |               |
+|  2   | zookeeper 3.6.2      | 用来协调bridge-server实例，以及每个实例要处理的任务数量；通过zk达到高可用，负载均衡 |               |
+|  3   | bridge-admin.tar.gz  | 彩虹桥的管理后台，维护目标源，以及任务等数据；测试环境可以部署一个实例；生产环境可部署多个实例，再用nginx做反向代理 | 依赖zk、mysql |
+|  4   | bridge-server.tar.gz | 此为核心服务，用来处理任务，同步数据到目标源；可以部署很多实例，达到高可用和负载均衡；启动时需要启动参数: 集群名以及命名空间 | 依赖zk、mysql |
 
 mysql以及zookeeper的安装，这里就不介绍了
 
@@ -85,9 +85,555 @@ mysql以及zookeeper的安装，这里就不介绍了
 -logs
 ```
 
-1、把bridge-admin.sql执行
+**1、把bridge-admin.sql执行**
 
-2、修改application.yml中的数据库配置
+**2、修改application.yml中的数据库配置**
+
+```yaml
+spring:
+	datasource:
+    #定义数据库配置
+    host: 127.0.0.1:3306
+    database: rainbow_bridge
+    password: root
+    username: root
+```
+
+**3、配置启动端口**
+
+```java
+server:
+  port: 8072
+```
+
+**4、准备zookeeper**
+
+因为在初始化数据库中，表basic_zk里面维护了zk的信息
+
+```sql
+1	zk	127.0.0.1:2181	/bridge		dev	2021-11-06 16:00:14	2021-11-06 16:00:17
+```
+
+表字段servers中是zk的地址，为 127.0.0.1:2181；你可以配置成自己的zookeeper地址
+
+然后启动zookeeper就行了
+
+**5、执行startup.sh**
+
+这样admin服务就启动了
+
+### 安装server
+
+解压bridge-server.tar.gz，可以看到目录结构
+
+```
+-bin
+	 restart.sh    //重启
+	 startup.bat   //启动
+	 startup.sh    //启动
+	 stop.sh			 //停止
+-conf
+	application.yml		//配置文件
+	logback.xml				//日志记录配置
+-lib
+	*.jar
+-logs
+```
+
+**1、修改application.yml中的数据库配置**
+
+```yaml
+spring:
+	datasource:
+    #定义数据库配置
+    host: 127.0.0.1:3306
+    database: rainbow_bridge
+    password: root
+    username: root
+```
+
+**2、配置启动端口**
+
+```java
+server:
+  port: 8064
+```
+
+**3、启动集群以及命名空间**
+
+```yaml
+bridge:
+  #启动时 需指定命名空间/环境，以及所属集群
+  env: dev
+  clusterCode: c1
+  #启动时 可以指定 此实例 可以处理多少任务
+  maxTaskCount: 3
+  #异步处理任务的线程池 配置
+  #核心线程数
+  threadCorePoolSize: 10
+  #最大线程数
+  threadMaxPoolSize: 20
+  #等待队列大小
+  threadQueueSize: 100
+```
+
+**env环境代码**
+
+env的值必须存在于表basic_namespace中字段env中的值【对应控制台的命名空间】
+
+**clusterCode集群代码**
+
+clusterCode的值必须存在于表basic_cluster中字段code中的值【对应控制台的集群管理】
+
+**maxTaskCount最大处理任务数**
+
+如果此集群中的任务很少，有可能此实例没有抢得过其他实例，很有可能此实例就没有任务执行。
+
+即时集群中的任务很多，但此实例处理的任务数 不会超过 最大处理任务数
+
+**处理任务线程池**
+
+任务的处理可以同步，也可以异步；可自行配置线程池大小
+
+**4、执行startup.sh**
+
+这样server服务就启动了。
+
+> 可以启动多个实例哦，体验高可用、负载均衡；自动去抢任务哦
+
+## 控制台
+
+控制台访问，根据admin部署的情况，请求ip+port
+
+控制台是不依赖server实例的，也就是不安装server，照样可以运行控制台哦
+
+```url
+http://127.0.0.1:8072/
+```
+
+### 登录页面
+
+![登录页面](/Users/gujiachun/Downloads/登录页面.png)
+
+V1.0版本时没有权限控制的，所以直接登录进入 就行了
+
+### 主菜单
+
+![主菜单](/Users/gujiachun/Downloads/主菜单.png)
+
+#### 基础设置
+
+配置整个系统的基础信息
+	1、命名空间：配置不同环境
+	2、集群管理：配置不同环境中存在哪些集群
+	3、ZK管理：配置不同环境中zookeeper的地址
+	4、MQ管理：配置不同环境需要订阅哪些源数据库binlog的MQ消息中间件
+	5、Topic管理：配置源数据库binlog产生了哪些topic
+
+#### 目标源设置
+
+配置我们需要把数据同步到哪些目标源
+	1、mysql目标源：mysql目标源相关的配置
+	2、redis目标源：redis目标源相关的配置
+	3、es目标源：es目标源相关的配置
+
+#### 任务管理
+
+创建同步数据任务
+
+## 命名空间
+
+![命名空间](/Users/gujiachun/Downloads/命名空间.png)
+
+配置不同的环境，整个系统时支持多个环境，环境代码要唯一哦
+
+## 集群管理
+
+![集群管理](/Users/gujiachun/Downloads/集群管理.png)
+
+维护不同环境中有哪些集群
+
+## ZK管理
+
+![zk管理](/Users/gujiachun/Downloads/zk管理.png)
+
+维护不同环境对应的zk服务；**一个环境只能有一个zk服务器，（不同环境可以配置一样的zk服务，但根节点路径要不一样）**
+
+生产环境zk服务需要高可用哦
+
+> 根节点路径：多个环境可以共用一个zk服务，需要根节点不一样哦
+
+## MQ管理
+
+维护不同环境的mq，此mq是对应canal server端配置的MQ；Canal Server虽然支持直连，但生产环境不推荐，推荐配合MQ同步binlog日志
+
+![mq管理](/Users/gujiachun/Downloads/mq管理.png)
+
+mq类型支持rocketmq和kafka
+
+## Topic管理
+
+![topic管理](/Users/gujiachun/Downloads/topic管理.png)
+
+topic主要也是对应canal server端配置的mq中的topic，哪些源数据库中的表同步到此topic
+
+![新建topic](/Users/gujiachun/Downloads/新建topic.png)
+
+## Mysql目标源
+
+![mysql目标源](/Users/gujiachun/Downloads/mysql目标源.png)
+
+维护需要把数据同步到哪些目标mysql源中
+
+**数据库配置**
+
+```
+数据源配置格式（k1=v1;k2=v2）如下：
+driverClassName=com.mysql.cj.jdbc.Driver;maxActive=20;maxPoolPreparedStatementPerConnectionSize=20;minIdle=8;initialSize=8;maxWait=60000;testOnBorrow=false;testOnReturn=false;timeBetweenEvictionRunsMillis=60000;minEvictableIdleTimeMillis=30000;testWhileIdle=true;password=root;url=jdbc:mysql://127.0.0.1:3306/test1?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai;username=root;validationQuery=SELECT 1
+```
+
+**其中的key是不能改的，value可以改；key如下**
+
+```
+driverClassName
+maxActive
+maxPoolPreparedStatementPerConnectionSize
+minIdle
+initialSize
+maxWait
+testOnBorrow
+testOnReturn
+timeBetweenEvictionRunsMillis
+minEvictableIdleTimeMillis
+testWhileIdle
+password
+url
+username
+validationQuery
+```
+
+以上的key其实就是 druid数据链接池的配置
+
+## Redis目标源
+
+![redis目标源](/Users/gujiachun/Downloads/redis目标源.png)
+
+维护不同环境的redis，可以把数据同步到redis中；支持多种部署方式，单机、哨兵、集群版redis
+
+**连接配置**
+
+配置格式（k1=v1;k2=v2）如
+
+```
+redis.single.host=localhost;redis.single.max-active=8;redis.single.max-idle=8;redis.single.min-idle=1;redis.single.database=0;redis.single.max-wait=5000;redis.single.so-timeout=1000;redis.single.port=6379
+```
+
+### 单机配置
+
+```yaml
+#单节点redis的连接配置信息
+redis.single.host=localhost
+#*资源池中的最大连接数*
+redis.single.max-active= 8
+#*资源池允许的最大空闲连接数*
+redis.single.max-idle= 8
+#*资源池确保的最少空闲连接数*
+redis.single.min-idle=1
+redis.single.password= test123
+redis.single.database=0
+#*当资源池连接用尽后，调用者的最大等待时间（单位为毫秒）*
+redis.single.max-wait=5000
+## 请求响应时间毫秒
+redis.single.so-timeout=1000
+redis.single.port=6379
+```
+
+需要用分号;拼接哦，不要忘了哦
+
+### 哨兵配置
+
+```yaml
+redis.sentinel.master-name=mymaster
+#redis配置示例：
+redis.sentinel.nodes=ip1:port1,ip2:port2,ip3:port3
+## 连接超时时间
+redis.sentinel.connect-timeout=1000
+## 最大连接数
+redis.sentinel.max-active=8
+## 最大空闲连接数
+redis.sentinel.max-idle=8
+##  连接密码
+redis.sentinel.password=passwd1
+## 请求响应时间毫秒
+redis.sentinel.so-timeout=1000
+## 等待连接超时时间毫秒
+redis.sentinel.max-wait= 1000
+## 最新空闲连接数
+redis.sentinel.min-idle= 1
+```
+
+需要用分号;拼接哦，不要忘了哦
+
+### 集群配置
+
+```
+#redis集群配置示例：
+redis.cluster.nodes=ip1:port1,ip2:port2,ip3:port3
+## 连接超时时间
+redis.cluster.connect-timeout=1000
+## 最大连接数
+redis.cluster.max-active=8
+## 最大空闲连接数
+redis.cluster.max-idle=8
+##  连接密码
+redis.cluster.password=passwd1
+## 请求响应时间毫秒
+redis.cluster.so-timeout=1000
+## 等待连接超时时间毫秒
+redis.cluster.max-wait= 1000
+## 最新空闲连接数
+redis.cluster.min-idle= 1
+```
+
+需要用分号;拼接哦，不要忘了哦
+
+## ES目标源
+
+马上就来了
+
+## 任务管理
+
+![任务管理](/Users/gujiachun/Downloads/任务管理.png)
+
+### 创建任务
+
+指定订阅哪个topic，同步哪种类型目标源
+
+指定任务在哪个集群中处理；并且指定期望有多少个server实例执行
+
+指定执行方式是异步 还是 同步
+
+### 任务状态
+
+未发布、已发布、已停用
+
+### 在线实例数
+
+可以实时查看有几个server实例在处理此任务
+
+## 规则
+
+任务列表中，针对不同的目标源类型，会有不同的规则配置
+
+![规则](/Users/gujiachun/Downloads/规则.png)
+
+规则的作用，就是让业务自行配置，如何同步数据
+
+### Mysql目标源规则
+
+![mysql规则](/Users/gujiachun/Downloads/mysql规则.png)
+
+本质就是需要配置哪个源数据 同步到 哪个目标
+
+![新建mysql规则](/Users/gujiachun/Downloads/新增mysql规则.png)
+
+**源库**
+
+topic配置的源库
+
+**源表**
+
+topic配置的源表，有可能有多个表
+
+**mysql目标源**
+
+需要同步到哪个目标源
+
+**目标库**
+
+同步到目标库，必须和选择的目标源配置的数据库名保持一致
+
+**目标表**
+
+同步到目标表，这里只能写一张表【如果需要把一个源数据同步到多张表，可以新建多个规则】
+
+**源与目标关联列**
+
+源表 和 目标表之间通过 哪些列进行关联的，作为过滤条件用，类似 where id=xx and name=yy
+
+【格式（源列1=目标列1;源列2=目标列2）;如果列名一样可简写(列名1;列名2)】
+
+【新增时：无效】；【修改和删除时：作为目标表更新哪些数据的过滤条件】
+
+**同步列**
+
+源表 和 目标表 同步数据的列名映射关系；这个才是把源表的哪些列数据，同步到 目标表的哪些列
+
+前提条件是 【**源与目标关联列**】过滤后
+
+【格式（源列1=目标列1;源列2=目标列2）;如果列名一样可简写(列名1;列名2)】
+
+**新增事件**
+
+是否开启 源表发生【新增数据事件】的处理同步；即源表insert操作后，要不要同步。
+
+**修改事件**
+
+是否开启 源表发生【修改数据事件】的处理同步；即源表update操作后，要不要同步。
+
+**删除事件**
+
+是否开启 源表发生【删除数据事件】的处理同步；即源表delete操作后，要不要同步。
+
+### mysql执行规则
+
+![mysql执行规则](/Users/gujiachun/Downloads/mysql事件执行规则.png)
+
+在进行同步时，可以自定义同步规则
+
+#### 新增事件执行规则
+
+![mysql新增事件执行规则](/Users/gujiachun/Downloads/mysql新增事件执行规则.png)
+
+**目标表的主键列名**
+
+新增同步时，如果目标表有自己的主键，那么我们可以在插入数据时，自动生产主键；
+
+此处配置Id列名，以及生成规则，暂只支持uuid（列名=uuid）; 如果此值为空 表示新增时忽略
+
+**目标表的同步标识列名**
+
+新增同步时，有些业务需要区分数据来源，那么就有必要有个列标识一下数据来源
+
+【格式(目标列=指定来源值)，如: sourceType=sync；来源值随业务定】，这样就可以区分哪些数据是同步过来的；可以为空，表示不需要区分来源
+
+**新增数据过滤-同步条件**
+
+新增过滤条件，源数据是什么值才同步，不满足条件 就不同步此数据
+
+针对源数据的过滤条件，表达式成立才会同步此数据，【属性用：源表的列名】
+
+【goods_name=='abc' 或 price < 30 && is_del==0】
+
+```
+利用了com.googlecode.aviator表达式引擎，可自行网补
+```
+
+简单的关系表达式
+
+```
+支持的关系运算符包括"<" "<=" ">" ">=" 以及"=="和"!=" 
+```
+
+逻辑表达式
+
+```
+一元否定运算符"!"，以及逻辑与的"&&"，逻辑或的"||"
+```
+
+#### 修改事件执行规则
+
+![mysql修改事件执行规则](/Users/gujiachun/Downloads/mysql修改事件执行规则.png)
+
+**源表的旧数据过滤-同步条件**
+
+修改事件的过滤条件，针对修改前的源数据过滤条件，表达式成立才同步；如【goods_name=='abc' 或 price < 30 && is_del==0】
+
+**源表的新数据过滤-同步条件**
+
+修改事件的过滤条件，针对修改后的源数据过滤条件，表达式成立才同步；如【goods_name=='abc' 或 price < 30 && is_del==0】
+
+#### 删除事件执行规则
+
+![mysql删除事件执行规则](/Users/gujiachun/Downloads/mysql删除事件执行规则.png)
+
+**源表的删除数据过滤-同步条件**
+
+删除事件的过滤条件，针对删除的源数据过滤条件，表达式成立才同步；如【goods_name=='abc' 或 price < 30 && is_del==0】
+
+**删除策略**
+
+![删除策略](/Users/gujiachun/Downloads/mysql删除事件规则策略.png)
+
+**删除对应的行**，即根据源与目标关联列过滤进行删除
+
+**只更新对应的值为空**，即根据源与目标关联列过滤，更新相关同步列
+
+### redis执行规则
+
+![redis执行规则](/Users/gujiachun/Downloads/redis同步规则.png)
+
+redis的动态执行规则，是利用了freemarker执行引擎，也就是java开发比较熟悉的，${xxx}里面的是针对表的列名
+
+![新增redis执行规则](/Users/gujiachun/Downloads/redis新增执行规则.png)
+
+**源库**
+
+topic配置的源库
+
+**源表**
+
+topic配置的源表，有可能有多个表
+
+**redis目标源**
+
+需要同步到哪个目标源
+
+**执行命令**
+
+redis的命令，先支持set、hset、hmset、incr、delete、delhKeys
+
+**key格式**
+
+支持写固定的key，也可以支持动态的key；如 key1-${good_id}-p；其中的good_id是源表的列名
+
+支持freemarker解析引擎，利用源表中的数据，对模板进行解析；最终生成值。【如：user_${name}_act】
+
+**field格式**
+
+field的模板【field是用来支持 hset、delhKeys指令的】；支持freemarker解析引擎，利用源表中的数据，对模板进行解析；最终生成值。【如：user_${name}_act】，如果多个field用(逗号,)隔开
+
+**value格式**
+
+value的模板,支持freemarker解析引擎，利用源表中的数据，对模板进行解析；最终生成值。【如：user_${name}_act】，如果hmset命令需要，map对象；可对此value设置json格式字符串，系统会自动转为map
+
+**过期时间**
+
+设置key的过期时间，即过多少秒后 过期；可以为空，代表不过期
+
+**固定时间过期**
+
+设置key的过期时间，即在固定的时间点过期，即每天的哪个时间点过期，一旦有更新 即代表第二天固定时间点；可以为空，代表不过期
+
+**新增事件**
+
+是否开启 源表发生【新增数据事件】的处理同步；即源表insert操作后，要不要同步。
+
+**修改事件**
+
+是否开启 源表发生【修改数据事件】的处理同步；即源表update操作后，要不要同步。
+
+**删除事件**
+
+是否开启 源表发生【删除数据事件】的处理同步；即源表delete操作后，要不要同步。
+
+------
+
+## docker部署
+
+首先制作dockerfile文件，把部署的文件目录，执行copy镜像中
+
+```dockerfile
+FROM registry.sit.ptcloud.t.home/library/openjdk:8-jdk
+
+ENV TZ Asia/Shanghai
+
+COPY bridge-admin/ /opt/bridge-admin
+
+RUN chmod 755 /opt/bridge-admin/bin/*.sh
+
+ENTRYPOINT ["/opt/bridge-admin/bin/startup.sh"]
+```
 
 
 

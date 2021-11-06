@@ -1,9 +1,6 @@
 package com.rainbow.bridge.biz.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -50,19 +47,19 @@ public class SyncTaskRuleRedisEntity implements Serializable {
     private String keyFormat;
 
     @ApiModelProperty(value = "field模板 针对hash结构")
-    @TableField("field_format")
+    @TableField(value = "field_format",updateStrategy = FieldStrategy.IGNORED)
     private String fieldFormat;
 
     @ApiModelProperty(value = "value模板")
-    @TableField("value_format")
+    @TableField(value = "value_format",updateStrategy = FieldStrategy.IGNORED)
     private String valueFormat;
 
     @ApiModelProperty(value = "过期时间 毫秒")
-    @TableField("expire_time")
+    @TableField(value = "expire_time",updateStrategy = FieldStrategy.IGNORED)
     private Long expireTime;
 
     @ApiModelProperty(value = "在每天的固定时间过期")
-    @TableField("fixed_time")
+    @TableField(value = "fixed_time",updateStrategy = FieldStrategy.IGNORED)
     private Time fixedTime;
 
     @ApiModelProperty(value = "是否开启新增同步 0:不开启，1：开启")

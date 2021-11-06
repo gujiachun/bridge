@@ -26,22 +26,25 @@ spring:
       testWhileIdle: true
       timeBetweenEvictionRunsMillis: 60000
       validationQuery: SELECT 1
-    password: root
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://127.0.0.1:3306/rainbow_bridge?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${spring.datasource.host}/${spring.datasource.database}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    #定义数据库配置
+    host: 127.0.0.1:3306
+    database: rainbow_bridge
+    password: root
     username: root
 
 mybatis-plus:
   #实体类包名
   type-aliases-package: com.rainbow.bridge.biz.entity
   mapper-locations: classpath*:mapper/**/*.xml
-  configuration:
-    # mybatis plus 执行sql日志输出
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    # mybatis plus 执行sql日志输出
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 
 bridge:
-  #启动时 需指定环境，以及所属集群
+  #启动时 需指定命名空间/环境，以及所属集群
   env: dev
   clusterCode: c1
   #启动时 可以指定 此实例 可以处理多少任务

@@ -145,9 +145,9 @@
           {{ scope.row.expireTime }}
         </template>
       </el-table-column>
-      <el-table-column label="固定过期时间(秒)" show-overflow-tooltip align="center">
+      <el-table-column label="固定过期时间" show-overflow-tooltip align="center">
         <template slot="header" slot-scope="scope">
-          <span>固定过期时间(秒)</span>&nbsp;
+          <span>固定过期时间</span>&nbsp;
           <el-popover placement="top-start" width="500" trigger="hover"
             content="设置key的过期时间，即在固定的时间点过期，即每天的哪个时间点过期，一旦有更新 即代表第二天固定时间点；可以为空，代表不过期">
             <span slot="reference">
@@ -172,8 +172,6 @@
         <template slot-scope="scope">
           <span v-if="scope.row.insertEnable==0" style="color:red;">关闭</span>
           <span v-if="scope.row.insertEnable==1" style="color:green;">启动</span>
-          &nbsp;
-          <el-link type="primary" @click.native="handleInsertUpdate(scope.row)"><i class="el-icon-edit"></i></el-link>
         </template>
       </el-table-column>
       <el-table-column label="修改事件" width="100" align="center">
@@ -189,8 +187,6 @@
         <template slot-scope="scope">
           <span v-if="scope.row.updateEnable==0" style="color:red;">关闭</span>
           <span v-if="scope.row.updateEnable==1" style="color:green;">启动</span>
-          &nbsp;
-          <el-link type="primary" @click.native="handleUpdateUpdate(scope.row)"><i class="el-icon-edit"></i></el-link>
         </template>
       </el-table-column>
       <el-table-column label="删除事件" width="100" align="center">
@@ -206,8 +202,6 @@
         <template slot-scope="scope">
           <span v-if="scope.row.deleteEnable==0" style="color:red;">关闭</span>
           <span v-if="scope.row.deleteEnable==1" style="color:green;">启动</span>
-          &nbsp;
-          <el-link type="primary" @click.native="handleDeleteUpdate(scope.row)"><i class="el-icon-edit"></i></el-link>
         </template>
       </el-table-column>
       <el-table-column label="状态" width="100" align="center">
@@ -351,7 +345,7 @@
               </span>
             </el-popover>
           </template>
-          <el-input v-model="nodeModel.fixedTime" style="width:300px"/>
+          <el-input v-model="nodeModel.fixedTime" placeholder="00:01:30" style="width:300px"/>
         </el-form-item>
         <el-form-item label="新增事件" prop="insertEnable">
           <template slot="label">
