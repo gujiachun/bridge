@@ -646,7 +646,11 @@ value的模板,支持freemarker解析引擎，利用源表中的数据，对模�
 
 ------
 
+# 相关文献
 
+Canal项目地址：https://github.com/alibaba/canal
+
+Canal文档：https://github.com/alibaba/canal/wiki/Introduction
 
 
 
