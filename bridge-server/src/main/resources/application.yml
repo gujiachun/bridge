@@ -1,6 +1,6 @@
 
 server:
-  port: 8064
+  port: 8066
 
 spring:
   application:
@@ -46,7 +46,8 @@ mybatis-plus:
 bridge:
   #启动时 需指定命名空间/环境，以及所属集群
   env: dev
-  clusterCode: c1
+  #可以指定集群代码，如果不配置，就根据各个集群server实例数情况，自动分配到某个集群
+#  clusterCode: c1
   #启动时 可以指定 此实例 可以处理多少任务
   maxTaskCount: 3
   #异步处理任务的线程池 配置

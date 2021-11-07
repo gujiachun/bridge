@@ -28,6 +28,8 @@ public class TaskBizDto {
 
     private String clusterName;
 
+    private String clusterCode;
+
     private Integer instanceCount;
 
     private Integer activeCount;

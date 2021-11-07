@@ -8,6 +8,18 @@ export function getTaskList(params) {
   })
 }
 
+export function getTaskActiveList(env,clusterCode,taskId) {
+  return request({
+    url: '/taskActiveCount',
+    method: 'get',
+    params: {
+      env,
+      clusterCode,
+      taskId
+    }
+  })
+}
+
 export function getTask(id) {
   return request({
     url: '/task/' + id,

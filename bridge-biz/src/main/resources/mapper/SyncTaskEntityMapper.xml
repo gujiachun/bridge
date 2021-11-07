@@ -18,7 +18,8 @@
         sync_task.instance_count AS instanceCount,
         basic_topic.topic AS topic,
         basic_mq.name AS mqName,
-        basic_cluster.name AS clusterName
+        basic_cluster.name AS clusterName,
+        basic_cluster.code AS clusterCode
         FROM sync_task
             inner join basic_topic on sync_task.basic_topic_id = basic_topic.id
             inner join basic_mq on basic_topic.mq_id = basic_mq.id

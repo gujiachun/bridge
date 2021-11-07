@@ -37,6 +37,44 @@
           {{ scope.row.env }}
         </template>
       </el-table-column>
+      <el-table-column label="在线任务数" width="150" align="center">
+        <template slot="header" slot-scope="scope">
+          <span>在线任务数</span>&nbsp;
+          <el-popover
+            placement="top-start"
+            width="200"
+            trigger="hover"
+            content="集群中处理了多少个任务">
+            <span slot="reference">
+              <i class="el-icon-warning-outline" style="color:#1989fa"></i>
+            </span>
+          </el-popover>
+        </template>
+        <template slot-scope="scope">
+          <span style="color:green;font-weight:bold">{{ scope.row.activeTaskCount }}</span>
+          &nbsp;
+          <el-link type="success" v-if="scope.row.activeTaskCount > 0" @click.native="handleShowActiveTask(scope.row)"><i class="el-icon-view el-icon--right"></i></el-link>
+        </template>
+      </el-table-column>
+      <el-table-column label="在线实例数" width="150" align="center">
+        <template slot="header" slot-scope="scope">
+          <span>在线实例数</span>&nbsp;
+          <el-popover
+            placement="top-start"
+            width="200"
+            trigger="hover"
+            content="集群中有多少在线server实例在处理任务">
+            <span slot="reference">
+              <i class="el-icon-warning-outline" style="color:#1989fa"></i>
+            </span>
+          </el-popover>
+        </template>
+        <template slot-scope="scope">
+          <span style="color:green;font-weight:bold">{{ scope.row.activeServerCount }}</span>
+          &nbsp;
+          <el-link type="success" v-if="scope.row.activeServerCount > 0" @click.native="handleShowActiveServer(scope.row)"><i class="el-icon-view el-icon--right"></i></el-link>
+        </template>
+      </el-table-column>
       <el-table-column align="center" prop="created_at" label="创建时间" width="160">
         <template slot-scope="scope">
           <span>{{ scope.row.createdTime }}</span>
@@ -153,6 +191,28 @@ export default {
         env: null,
         remark: null
       }
+    },
+    handleShowActiveTask(row){
+      var str='';
+      str += '格式: 任务Id + 序列号（如：taskID000000001） <br/>';
+      row.tasks.forEach(element => {
+        str += '任务流水: ' + element + '<br/>';
+      });
+      this.$alert(str, '任务信息', {
+        confirmButtonText: '确定',
+        dangerouslyUseHTMLString: true
+      });
+    },
+    handleShowActiveServer(row){
+      var str='';
+      str += '格式: ip:port <br/>';
+      row.servers.forEach(element => {
+        str += '实例: ' + element + '<br/>';
+      });
+      this.$alert(str, '实例信息', {
+        confirmButtonText: '确定',
+        dangerouslyUseHTMLString: true
+      });
     },
     handleCreate() {
       this.resetModel()

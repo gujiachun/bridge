@@ -148,6 +148,8 @@
         </template>
         <template slot-scope="scope">
           <span style="color:green;font-weight:bold">{{ scope.row.activeCount }}</span>
+          &nbsp;
+          <el-link type="success" v-if="scope.row.activeCount > 0" @click.native="handleShowActive(scope.row)"><i class="el-icon-view el-icon--right"></i></el-link>
         </template>
       </el-table-column>
       <el-table-column label="环境代码" width="100" align="center">
@@ -288,7 +290,7 @@
 </template>
 
 <script>
-import { getTaskList, addTask, updateTask, deleteTask, updateTaskStatus, refreshTask } from '@/api/task'
+import { getTaskList, getTaskActiveList, addTask, updateTask, deleteTask, updateTaskStatus, refreshTask } from '@/api/task'
 import { getNameSpaceList } from '@/api/namespace'
 import { getTopicListByEnv } from '@/api/topic'
 import { getClusterListByEnv, getClusterList } from '@/api/cluster'
@@ -422,6 +424,19 @@ export default {
         console.info('taskId=' + row.id)
         this.$router.push('/task/rule/redis?taskId=' + row.id)
       }
+    },
+    handleShowActive(row){
+      getTaskActiveList(row.env,row.clusterCode,row.id).then(res => {
+        var str='';
+        res.data.forEach(element => {
+          var split = element.split(",")
+          str += '实例: ' + split[0] + '，开始时间: ' + split[1] + '<br/>';
+        });
+        this.$alert(str, '实例信息', {
+          confirmButtonText: '确定',
+          dangerouslyUseHTMLString: true
+        });
+      })
     },
     handleCreate() {
       this.resetModel()

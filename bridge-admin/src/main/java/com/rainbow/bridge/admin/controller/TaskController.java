@@ -132,13 +132,29 @@ public class TaskController {
     }
 
     @GetMapping("/taskActiveCount")
-    public Result<List<String>> getTaskActiveCount(@RequestParam("env") String env,
-                                              @RequestParam("clusterCode") String clusterCode){
+    public Result<Set<String>> getTaskActiveCount(@RequestParam("env") String env,
+                                                    @RequestParam("clusterCode") String clusterCode,
+                                                   @RequestParam("taskId") String taskId){
 
         ZkBridgeClient zkBridgeClient = zkBridgeClientFactory.getZkBridgeClient(env);
         List<String> children = zkBridgeClient.getChildren(zkBridgeClient.getRootPath() + "/" + clusterCode);
 
-        return Result.success(children);
+        if (children != null){
+            Set<String> ipPortList = new HashSet<>();
+            for (String taskPath : children){
+                //任务节点的值 格式[ip:port,datetime] 如172.16.112.1:8064,2021-10-22 21:50:57
+                //ip+port代表着实例
+                if (taskPath.indexOf(taskId)>=0){
+                    Object o = zkBridgeClient.readData(zkBridgeClient.getRootPath() + "/" + clusterCode+ "/" + taskPath, true);
+                    if (o != null){
+                        ipPortList.add(o.toString());
+                    }
+                }
+            }
+            return Result.success(ipPortList);
+        }
+
+        return Result.success();
     }
 
     @GetMapping("/task/refresh/{clusterId}")
