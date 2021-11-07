@@ -8,7 +8,7 @@
 
 如下图
 
-![冗余图](https://p.ampmake.com/fed/image/png/158cb1e1cb7956956687f3467ce5f091.png)
+![冗余图](https://p26.toutiaoimg.com/origin/pgc-image/c195cc2625bb43e998a3fd79650b7e85?from=pc)
 
 上图中订单库中的表，冗余了用户的姓名以及商品名称。这个主要目的就是为了订单业务中，快速的查询出用户名、商品名；防止跨库查询。但是有时候业务是需要 冗余的数据，要和源数据保持一致，即更新了用户姓名，订单中的用户姓名也要更新。这个就是冗余导致数据不一致的问题
 
@@ -16,7 +16,7 @@
 
 如下图
 
-![商品缓存图](https://p.ampmake.com/fed/image/png/0c58dda57343231ced03a0c159d523ed.png)
+![商品缓存图](https://p26.toutiaoimg.com/origin/pgc-image/57c3f7e9a2b14ec2b863caad290ceb0a?from=pc)
 
 上图中评价服务需要拿到商品信息，为了减少和商品服务的调用频次，有时候需要把商品信息缓存到redis中；这个时候也会出现商品信息更新了，那redis中的缓存 没法即时更新
 
@@ -48,7 +48,7 @@
 
 ## 架构
 
-![架构图](/Users/gujiachun/Downloads/架构图V1.png)
+![架构图](https://p26.toutiaoimg.com/origin/pgc-image/e4e085ad5f384361ac657b7b9981697c?from=pc)
 
 彩虹桥（rainbow bridge）可以理解为canal的**客户端平台**，以任务的方式执行业务需求，***为了保证高可用、负载均衡，引入了集群设计以及zookeeper做实例协调***。
 
@@ -64,6 +64,8 @@
 |  4   | bridge-server.tar.gz | 此为核心服务，用来处理任务，同步数据到目标源；可以部署很多实例，达到高可用和负载均衡；启动时需要启动参数: 集群名以及命名空间 | 依赖zk、mysql |
 
 mysql以及zookeeper的安装，这里就不介绍了
+
+到码云中下载release版本 https://gitee.com/gujiachun/bridge/releases
 
 ### 安装admin
 
@@ -218,13 +220,13 @@ http://127.0.0.1:8072/
 
 ### 登录页面
 
-![登录页面](/Users/gujiachun/Downloads/登录页面.png)
+![登录页面](https://p26.toutiaoimg.com/origin/pgc-image/580e86f4e73142a49febb31c647b0bfb?from=pc)
 
 V1.0版本时没有权限控制的，所以直接登录进入 就行了
 
 ### 主菜单
 
-![主菜单](/Users/gujiachun/Downloads/主菜单.png)
+![主菜单](https://p26.toutiaoimg.com/origin/pgc-image/051c96073d8147f7a73573afad178b46?from=pc)
 
 #### 基础设置
 
@@ -248,13 +250,13 @@ V1.0版本时没有权限控制的，所以直接登录进入 就行了
 
 ## 命名空间
 
-![命名空间](/Users/gujiachun/Downloads/命名空间.png)
+![命名空间](https://p26.toutiaoimg.com/origin/pgc-image/0cb0edcf17254c7bb173a20ade873f96?from=pc)
 
 配置不同的环境，整个系统时支持多个环境，环境代码要唯一哦
 
 ## 集群管理
 
-![集群管理](/Users/gujiachun/Downloads/集群管理.png)
+![集群管理](https://p26.toutiaoimg.com/origin/pgc-image/f80e80f60014415f9abba47c712e00a0?from=pc)
 
 维护不同环境中有哪些集群
 
@@ -266,7 +268,7 @@ V1.0版本时没有权限控制的，所以直接登录进入 就行了
 
 ## ZK管理
 
-![zk管理](/Users/gujiachun/Downloads/zk管理.png)
+![zk管理](https://p26.toutiaoimg.com/origin/pgc-image/c3fee6bec9da42c5be87277edcaeaaa2?from=pc)
 
 维护不同环境对应的zk服务；**一个环境只能有一个zk服务器，（不同环境可以配置一样的zk服务，但根节点路径要不一样）**
 
@@ -278,21 +280,21 @@ V1.0版本时没有权限控制的，所以直接登录进入 就行了
 
 维护不同环境的mq，此mq是对应canal server端配置的MQ；Canal Server虽然支持直连，但生产环境不推荐，推荐配合MQ同步binlog日志
 
-![mq管理](/Users/gujiachun/Downloads/mq管理.png)
+![mq管理](https://p26.toutiaoimg.com/origin/pgc-image/5bd7622f5a12412885513fce8f3c2113?from=pc)
 
 mq类型支持rocketmq和kafka
 
 ## Topic管理
 
-![topic管理](/Users/gujiachun/Downloads/topic管理.png)
+![topic管理](https://p26.toutiaoimg.com/origin/pgc-image/d32d7df5c77942d09a47acccf83adc7e?from=pc)
 
 topic主要也是对应canal server端配置的mq中的topic，哪些源数据库中的表同步到此topic
 
-![新建topic](/Users/gujiachun/Downloads/新建topic.png)
+![新建topic](https://p26.toutiaoimg.com/origin/pgc-image/a7f4475a2d7a46f287a8c18b42210f94?from=pc)
 
 ## Mysql目标源
 
-![mysql目标源](/Users/gujiachun/Downloads/mysql目标源.png)
+![mysql目标源](https://p26.toutiaoimg.com/origin/pgc-image/551f182346414438a608f9ccb6fc1e4f?from=pc)
 
 维护需要把数据同步到哪些目标mysql源中
 
@@ -327,7 +329,7 @@ validationQuery
 
 ## Redis目标源
 
-![redis目标源](/Users/gujiachun/Downloads/redis目标源.png)
+![redis目标源](https://p26.toutiaoimg.com/origin/pgc-image/ce4f6cea52bb4e6b9bd2e82b905158d7?from=pc)
 
 维护不同环境的redis，可以把数据同步到redis中；支持多种部署方式，单机、哨兵、集群版redis
 
@@ -414,7 +416,7 @@ redis.cluster.min-idle= 1
 
 ## 任务管理
 
-![任务管理](/Users/gujiachun/Downloads/任务管理.png)
+![任务管理](https://p26.toutiaoimg.com/origin/pgc-image/d3f7e5c50ad24a98b044c0b398e945ad?from=pc)
 
 ### 创建任务
 
@@ -450,17 +452,17 @@ redis.cluster.min-idle= 1
 
 任务列表中，针对不同的目标源类型，会有不同的规则配置
 
-![规则](/Users/gujiachun/Downloads/规则.png)
+![规则](https://p26.toutiaoimg.com/origin/pgc-image/d0cbd39ad615428c924787022f588e9a?from=pc)
 
 规则的作用，就是让业务自行配置，如何同步数据
 
 ### Mysql目标源规则
 
-![mysql规则](/Users/gujiachun/Downloads/mysql规则.png)
+![mysql规则](https://p26.toutiaoimg.com/origin/pgc-image/06813e7c2b2b405b8c34bf89ee2d36a3?from=pc)
 
 本质就是需要配置哪个源数据 同步到 哪个目标
 
-![新建mysql规则](/Users/gujiachun/Downloads/新增mysql规则.png)
+![新建mysql规则](https://p26.toutiaoimg.com/origin/pgc-image/84353a56f89540ba82ee7db3df651205?from=pc)
 
 **源库**
 
@@ -512,13 +514,13 @@ topic配置的源表，有可能有多个表
 
 ### mysql执行规则
 
-![mysql执行规则](/Users/gujiachun/Downloads/mysql事件执行规则.png)
+![mysql执行规则](https://p26.toutiaoimg.com/origin/pgc-image/f9666fb0360841fab2a5a094f0c3ba1c?from=pc)
 
 在进行同步时，可以自定义同步规则
 
 #### 新增事件执行规则
 
-![mysql新增事件执行规则](/Users/gujiachun/Downloads/mysql新增事件执行规则.png)
+![mysql新增事件执行规则](https://p26.toutiaoimg.com/origin/pgc-image/a0e0db585c5044e69348390aae4bf231?from=pc)
 
 **目标表的主键列名**
 
@@ -558,7 +560,7 @@ topic配置的源表，有可能有多个表
 
 #### 修改事件执行规则
 
-![mysql修改事件执行规则](/Users/gujiachun/Downloads/mysql修改事件执行规则.png)
+![mysql修改事件执行规则](https://p26.toutiaoimg.com/origin/pgc-image/24c8598d63e94c19ac53765ab21c6047?from=pc)
 
 **源表的旧数据过滤-同步条件**
 
@@ -570,7 +572,7 @@ topic配置的源表，有可能有多个表
 
 #### 删除事件执行规则
 
-![mysql删除事件执行规则](/Users/gujiachun/Downloads/mysql删除事件执行规则.png)
+![mysql删除事件执行规则](https://p26.toutiaoimg.com/origin/pgc-image/adf96ee0abae4fabb52cb2dd9aac586d?from=pc)
 
 **源表的删除数据过滤-同步条件**
 
@@ -578,7 +580,7 @@ topic配置的源表，有可能有多个表
 
 **删除策略**
 
-![删除策略](/Users/gujiachun/Downloads/mysql删除事件规则策略.png)
+![删除策略](https://p26.toutiaoimg.com/origin/pgc-image/b5042a631f1b47a28b80784c431eb580?from=pc)
 
 **删除对应的行**，即根据源与目标关联列过滤进行删除
 
@@ -586,11 +588,11 @@ topic配置的源表，有可能有多个表
 
 ### redis执行规则
 
-![redis执行规则](/Users/gujiachun/Downloads/redis同步规则.png)
+![redis执行规则](https://p26.toutiaoimg.com/origin/pgc-image/260227613181461cb7d6f0d40c38f0d1?from=pc)
 
 redis的动态执行规则，是利用了freemarker执行引擎，也就是java开发比较熟悉的，${xxx}里面的是针对表的列名
 
-![新增redis执行规则](/Users/gujiachun/Downloads/redis新增执行规则.png)
+![新增redis执行规则](https://p26.toutiaoimg.com/origin/pgc-image/b3866f70ab244ed5be195f79e4940d13?from=pc)
 
 **源库**
 
@@ -643,24 +645,6 @@ value的模板,支持freemarker解析引擎，利用源表中的数据，对模�
 是否开启 源表发生【删除数据事件】的处理同步；即源表delete操作后，要不要同步。
 
 ------
-
-
-
-## docker部署
-
-首先制作dockerfile文件，把部署的文件目录，执行copy镜像中
-
-```dockerfile
-FROM registry.sit.ptcloud.t.home/library/openjdk:8-jdk
-
-ENV TZ Asia/Shanghai
-
-COPY bridge-admin/ /opt/bridge-admin
-
-RUN chmod 755 /opt/bridge-admin/bin/*.sh
-
-ENTRYPOINT ["/opt/bridge-admin/bin/startup.sh"]
-```
 
 
 
