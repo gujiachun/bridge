@@ -2,6 +2,8 @@ server:
   port: 8072
 
 spring:
+  profiles:
+    active: dev
   application:
     name: bridge-admin
   datasource:
@@ -26,12 +28,10 @@ spring:
       timeBetweenEvictionRunsMillis: 60000
       validationQuery: SELECT 1
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://${spring.datasource.host}/${spring.datasource.database}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${db.host}/${db.database}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     #定义数据库配置
-    host: 127.0.0.1:3306
-    database: rainbow_bridge
-    password: root
-    username: root
+    username: ${db.username}
+    password: ${db.password}
 
 mybatis-plus:
   #实体类包名
@@ -41,8 +41,43 @@ mybatis-plus:
 #    # mybatis plus 执行sql日志输出
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+---
+# 开发环境配置
+spring:
+  profiles: dev
+db:
+  host: 192.168.58.79:13306
+  database: bridgedev
+  username: bridgedev
+  password: D1_ucXgN
 
+---
+# 测试环境配置
+spring:
+  profiles: test
+db:
+  host: 192.168.58.123:13306
+  database: bridgetest
+  username: bridgetest
+  password: vu_6WDNP
 
+---
+# 预生产环境配置
+spring:
+  profiles: ontest
+db:
+  host: 127.0.0.1:3306
+  database: rainbow_bridge
+  password: root
+  username: root
 
-
+---
+# 生产环境配置
+spring:
+  profiles: prod
+db:
+  host: 127.0.0.1:3306
+  database: rainbow_bridge
+  password: root
+  username: root
 

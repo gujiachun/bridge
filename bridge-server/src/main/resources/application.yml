@@ -1,8 +1,9 @@
-
 server:
   port: 8066
 
 spring:
+  profiles:
+    active: dev
   application:
     name: bridge-server
   datasource:
@@ -27,12 +28,10 @@ spring:
       timeBetweenEvictionRunsMillis: 60000
       validationQuery: SELECT 1
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://${spring.datasource.host}/${spring.datasource.database}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${db.host}/${db.database}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     #定义数据库配置
-    host: 127.0.0.1:3306
-    database: rainbow_bridge
-    password: root
-    username: root
+    username: ${db.username}
+    password: ${db.password}
 
 mybatis-plus:
   #实体类包名
@@ -42,12 +41,22 @@ mybatis-plus:
 #    # mybatis plus 执行sql日志输出
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+---
+# 开发环境配置
+spring:
+  profiles: dev
+db:
+  host: 192.168.58.79:13306
+  database: bridgedev
+  username: bridgedev
+  password: D1_ucXgN
 
+#这个是server业务用到的配置，不同的环境可以配置不同的命名空间和线程池大小
 bridge:
   #启动时 需指定命名空间/环境，以及所属集群
   env: dev
   #可以指定集群代码，如果不配置，就根据各个集群server实例数情况，自动分配到某个集群
-#  clusterCode: c1
+  #  clusterCode: c1
   #启动时 可以指定 此实例 可以处理多少任务
   maxTaskCount: 3
   #异步处理任务的线程池 配置
@@ -55,6 +64,72 @@ bridge:
   threadMaxPoolSize: 20
   threadQueueSize: 100
 
+---
+# 测试环境配置
+spring:
+  profiles: test
+db:
+  host: 192.168.58.123:13306
+  database: bridgetest
+  username: bridgetest
+  password: vu_6WDNP
 
+#这个是server业务用到的配置，不同的环境可以配置不同的命名空间和线程池大小
+bridge:
+  #启动时 需指定命名空间/环境，以及所属集群
+  env: test
+  #可以指定集群代码，如果不配置，就根据各个集群server实例数情况，自动分配到某个集群
+  #  clusterCode: c1
+  #启动时 可以指定 此实例 可以处理多少任务
+  maxTaskCount: 3
+  #异步处理任务的线程池 配置
+  threadCorePoolSize: 10
+  threadMaxPoolSize: 20
+  threadQueueSize: 100
 
+---
+# 预生产环境配置
+spring:
+  profiles: ontest
+db:
+  host: 127.0.0.1:3306
+  database: rainbow_bridge
+  password: root
+  username: root
+
+#这个是server业务用到的配置，不同的环境可以配置不同的命名空间和线程池大小
+bridge:
+  #启动时 需指定命名空间/环境，以及所属集群
+  env: ontest
+  #可以指定集群代码，如果不配置，就根据各个集群server实例数情况，自动分配到某个集群
+  #  clusterCode: c1
+  #启动时 可以指定 此实例 可以处理多少任务
+  maxTaskCount: 3
+  #异步处理任务的线程池 配置
+  threadCorePoolSize: 10
+  threadMaxPoolSize: 20
+  threadQueueSize: 100
+
+---
+# 生产环境配置
+spring:
+  profiles: prod
+db:
+  host: 127.0.0.1:3306
+  database: rainbow_bridge
+  password: root
+  username: root
+
+#这个是server业务用到的配置，不同的环境可以配置不同的命名空间和线程池大小
+bridge:
+  #启动时 需指定命名空间/环境，以及所属集群
+  env: prod
+  #可以指定集群代码，如果不配置，就根据各个集群server实例数情况，自动分配到某个集群
+  #  clusterCode: c1
+  #启动时 可以指定 此实例 可以处理多少任务
+  maxTaskCount: 3
+  #异步处理任务的线程池 配置
+  threadCorePoolSize: 10
+  threadMaxPoolSize: 20
+  threadQueueSize: 100
 

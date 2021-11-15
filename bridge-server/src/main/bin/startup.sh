@@ -10,13 +10,10 @@ case "`uname`" in
 		;;
 esac
 base=${bin_abs_path}/..
+echo ${base}
+
 export LANG=en_US.UTF-8
 export BASE=$base
-
-if [ -f $base/bin/server.pid ] ; then
-	echo "found server.pid , Please run stop.sh first ,then startup.sh" 2>&2
-    exit 1
-fi
 
 if [ ! -d $base/logs ] ; then
 	mkdir -p $base/logs
@@ -27,6 +24,7 @@ if [ -z "$JAVA" ] ; then
   JAVA=$(which java)
 fi
 
+#custom java sdk path
 CUSTOM_JAVA="/usr/bridge/java/bin/java"
 if [ -z "$JAVA" ]; then
   if [ -f $CUSTOM_JAVA ] ; then
@@ -37,15 +35,36 @@ if [ -z "$JAVA" ]; then
   fi
 fi
 
+#default env params
+ENV_OPTS="-Dspring.profiles.active=dev"
+
+#default java params
+JAVA_OPTS="-server -Xms2048m -Xmx2048m"
+JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=250 -XX:+UseGCOverheadLimit -XX:+ExplicitGCInvokesConcurrent"
+JAVA_OPTS="$JAVA_OPTS -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8"
+echo $JAVA_OPTS
+echo "----------"
+
 case "$#"
 in
 0 )
   ;;
+1 )
+  if [ -n "$1" ]; then
+   ENV_OPTS="-Dspring.profiles.active="$1
+  fi
+  ;;
 2 )
-  if [ "$1" = "debug" ]; then
-    DEBUG_PORT=$2
-    DEBUG_SUSPEND="n"
-    JAVA_DEBUG_OPT="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
+  echo "启动参数1:$1"
+  echo "启动参数2:$2"
+  if [ -n "$1" ]; then
+   ENV_OPTS="-Dspring.profiles.active="$1
+  fi
+
+  if [ -n "$2" ];then
+    if [ "$2" != "default" ];then
+     JAVA_OPTS="$2"
+    fi
   fi
   ;;
 * )
@@ -53,17 +72,12 @@ in
   exit;;
 esac
 
-JAVA_OPTS="-server -Xms2048m -Xmx2048m"
-echo $JAVA_OPTS
-echo "----------"
-
-JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=250 -XX:+UseGCOverheadLimit -XX:+ExplicitGCInvokesConcurrent "
-echo $JAVA_OPTS
-echo "----------"
-JAVA_OPTS=" $JAVA_OPTS -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8"
-echo $JAVA_OPTS
-echo "----------"
+#bridge server params
 BRIDGE_OPTS="-DappName=bridge-server -Ddruid.mysql.usePingMethod=false"
+echo "================================"
+
+echo "env params:"${ENV_OPTS}
+echo "java params:"${JAVA_OPTS}
 
 for i in $base/lib/*;
     do CLASSPATH=$i:"$CLASSPATH";
@@ -75,9 +89,7 @@ echo "cd to $bin_abs_path for workaround relative path"
 cd $bin_abs_path
 
 echo CLASSPATH :$CLASSPATH
-$JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $BRIDGE_OPTS -classpath .:$CLASSPATH com.rainbow.bridge.server.BridgeServerApplication
 
-#容器部署就没 必要产生server.pid
-#echo $! > $base/bin/server.pid
-# echo "cd to $current_path for continue"
-# cd $current_path
+$JAVA $JAVA_OPTS $BRIDGE_OPTS ${ENV_OPTS} -classpath .:$CLASSPATH com.rainbow.bridge.server.BridgeServerApplication
+
+

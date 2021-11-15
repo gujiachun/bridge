@@ -646,6 +646,96 @@ value的模板,支持freemarker解析引擎，利用源表中的数据，对模�
 
 ------
 
+## 任务刷新
+
+如何让任务以及规则配置好后，立即生效？
+
+1、需要把任务以及规则状态，设置为发布
+
+2、需要在任务管理中，点击任务刷新按钮
+
+3、任务刷新按钮 可以 指定刷新 什么环境，以及什么集群
+
+4、一旦操作了任务刷新，对应的环境集群的任务 就会自动分配。
+
+# Docker容器化部署
+
+## bridge-admin部署
+
+1、dockerfile文件，如下
+
+```
+#需要指定一个安装了java jdk1.8以上的centos7 64位
+FROM java_jdk1.8
+
+ARG arg_env=dev
+ARG arg_opts=default
+
+ENV TZ=Asia/Shanghai
+ENV ENV_CODE=$arg_env
+ENV START_OPTS=$arg_opts
+
+COPY bridge-admin/ /opt/bridge-admin
+
+RUN chmod 755 /opt/bridge-admin/bin/*.sh
+
+CMD /opt/bridge-admin/bin/startup.sh ${ENV_CODE} ${START_OPTS}
+```
+
+把dockerfile放到与bridge-admin同级目录下
+
+2、startup.sh脚本支持传2个参数
+
+第一个参数代表命名空间（环境），默认值为dev
+
+第二个参数是java_opts启动参数，默认值在脚本文件中
+
+可以不传，有对应的默认值
+
+3、执行docker build、push等命令，推送到harbor私有仓库中
+
+## bridge-server部署
+
+1、dockerfile文件，如下
+
+```
+#需要指定一个安装了java jdk1.8以上的centos7 64位
+FROM java_jdk1.8
+
+ARG arg_env=dev
+ARG arg_opts=default
+
+ENV TZ=Asia/Shanghai
+ENV ENV_CODE=$arg_env
+ENV START_OPTS=$arg_opts
+
+COPY bridge-server/ /opt/bridge-server
+
+RUN chmod 755 /opt/bridge-server/bin/*.sh
+
+CMD /opt/bridge-server/bin/startup.sh ${ENV_CODE} ${START_OPTS}
+```
+
+把dockerfile放到与bridge-server同级目录下
+
+2、startup.sh脚本支持传2个参数
+
+第一个参数代表命名空间（环境），默认值为dev
+
+第二个参数是java_opts启动参数，默认值在脚本文件中
+
+可以不传，有对应的默认值
+
+3、执行docker build、push等命令，推送到harbor私有仓库中
+
+
+
+
+
+
+
+
+
 # 相关文献
 
 Canal项目地址：https://github.com/alibaba/canal
