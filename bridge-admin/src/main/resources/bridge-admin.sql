@@ -93,7 +93,7 @@ CREATE TABLE `basic_topic` (
   `mq_id` int(11) DEFAULT NULL COMMENT 'basic_mq的主键',
   `remark` varchar(255) DEFAULT NULL COMMENT '描述',
   `sync_db` varchar(50) DEFAULT NULL COMMENT '同步库名',
-  `sync_table` varchar(50) DEFAULT NULL COMMENT '同步表',
+  `sync_table` varchar(3000) DEFAULT NULL COMMENT '同步表',
   `env` varchar(20) DEFAULT NULL COMMENT '环境代码',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='topic关联基础表';

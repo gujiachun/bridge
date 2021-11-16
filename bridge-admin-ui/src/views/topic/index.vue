@@ -122,7 +122,7 @@
               </span>
             </el-popover>
           </template>
-          <el-input v-model="nodeModel.syncTable" />
+          <el-input v-model="nodeModel.syncTable" type="textarea"/>
         </el-form-item>
         <el-form-item label="所属命名空间" prop="env">
           <el-select v-if="dialogStatus === 'create'" v-model="nodeModel.env" placeholder="选择所属命名空间">
