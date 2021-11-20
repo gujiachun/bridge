@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
@@ -21,9 +20,7 @@ import java.util.Objects;
  */
 @TableName("sync_task_rule_mysql")
 @ApiModel(value="SyncTaskRuleMysqlEntity对象", description="任务规则之mysql")
-public class SyncTaskRuleMysqlEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class SyncTaskRuleMysqlEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)

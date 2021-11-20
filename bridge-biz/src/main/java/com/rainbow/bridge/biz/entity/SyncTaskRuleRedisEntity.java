@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
 import java.sql.Time;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * <p>
@@ -19,9 +17,7 @@ import java.util.Objects;
  */
 @TableName("sync_task_rule_redis")
 @ApiModel(value="SyncTaskRuleRedisEntity对象", description="任务规则之redis")
-public class SyncTaskRuleRedisEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class SyncTaskRuleRedisEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)

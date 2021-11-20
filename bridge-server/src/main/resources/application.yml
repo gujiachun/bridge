@@ -46,10 +46,10 @@ mybatis-plus:
 spring:
   profiles: dev
 db:
-  host: 192.168.58.79:13306
-  database: bridgedev
-  username: bridgedev
-  password: D1_ucXgN
+  host: 127.0.0.1:3306
+  database: rainbow_bridge
+  username: root
+  password: root
 
 #这个是server业务用到的配置，不同的环境可以配置不同的命名空间和线程池大小
 bridge:

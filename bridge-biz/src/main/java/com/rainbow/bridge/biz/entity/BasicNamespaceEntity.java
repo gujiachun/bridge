@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -19,9 +18,7 @@ import java.util.Date;
  */
 @TableName("basic_namespace")
 @ApiModel(value="BasicNamespaceEntity对象", description="环境命名空间")
-public class BasicNamespaceEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class BasicNamespaceEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)

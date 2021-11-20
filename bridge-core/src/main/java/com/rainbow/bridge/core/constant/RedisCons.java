@@ -1,6 +1,10 @@
 package com.rainbow.bridge.core.constant;
 
-public class RedisCommandCons {
+/**
+ * redis常量
+ * @author gujiachun
+ */
+public class RedisCons {
 
     public static final String set = "set";
 
@@ -13,4 +17,13 @@ public class RedisCommandCons {
     public static final String delhKeys = "delhKeys";
 
     public static final String delete = "delete";
+
+    /** 单机 */
+    public static final Integer single = 0;
+
+    /** 哨兵 */
+    public static final Integer sentinel = 1;
+
+    /** 集群 */
+    public static final Integer cluster = 2;
 }

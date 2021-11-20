@@ -8,14 +8,14 @@ import com.rainbow.bridge.canal.CanalClient;
 import com.rainbow.bridge.canal.impl.KafkaMqCanalClient;
 import com.rainbow.bridge.canal.impl.RocketMqCanalClient;
 import com.rainbow.bridge.core.constant.CommonCons;
-import com.rainbow.bridge.core.enums.TargetTypeEnum;
 import com.rainbow.bridge.handler.CanalThreadUncaughtExceptionHandler;
 import com.rainbow.bridge.handler.EntryHandler;
 import com.rainbow.bridge.handler.MessageHandler;
 import com.rainbow.bridge.handler.impl.AsyncFlatMessageHandlerImpl;
 import com.rainbow.bridge.handler.impl.SyncFlatMessageHandlerImpl;
-import com.rainbow.bridge.server.handler.MysqlEntryHandler;
-import com.rainbow.bridge.server.handler.RedisEntryHandler;
+import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
+import com.rainbow.bridge.server.handler.factory.EntryHandlerFactory;
 import freemarker.template.Configuration;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
@@ -58,13 +58,13 @@ public class CanalClientFactory {
     }
 
     @Autowired
-    private TaskRuleFactory taskRuleFactory;
+    private Map<String, TaskRuleFactory> taskRuleFactoryMap;
 
     @Autowired
-    private RedisFactory redisFactory;
+    private Map<String, TargetFactory> targetFactoryMap;
 
     @Autowired
-    private MysqlDataSourceFactory mysqlDataSourceFactory;
+    private Map<String, EntryHandlerFactory> entryHandlerFactoryMap;
 
     @Autowired
     private Configuration freeMarkerConfiguration;
@@ -124,18 +124,14 @@ public class CanalClientFactory {
         client.setUnit(TimeUnit.SECONDS);
         client.setTaskId(syncTaskEntity.getId());
 
-        EntryHandler entryHandler = null;
 
-        TargetTypeEnum type = TargetTypeEnum.valueOf(syncTaskEntity.getTargetType());
-        switch (type){
-            case mysql:
-                entryHandler = new MysqlEntryHandler(syncTaskEntity.getId(),taskRuleFactory,mysqlDataSourceFactory);
-                break;
-            case redis:
-                entryHandler = new RedisEntryHandler(syncTaskEntity.getId(),taskRuleFactory,redisFactory,freeMarkerConfiguration);
-                break;
+        String targetType = syncTaskEntity.getTargetType();
+        String taskId = syncTaskEntity.getId();
 
-        }
+        EntryHandlerFactory entryHandlerFactory = getEntryHandlerFactory(targetType);
+
+        EntryHandler entryHandler = entryHandlerFactory.buildEntryHandler(targetType,taskId,
+                getTaskRuleFactory(targetType),getTargetFactory(targetType),freeMarkerConfiguration);
 
         //同步
         if (syncTaskEntity.getAsync() == 0){
@@ -162,5 +158,30 @@ public class CanalClientFactory {
 
     public Map<String, CanalClient> getTaskCanalClientMap() {
         return taskCanalClientMap;
+    }
+
+    private TargetFactory getTargetFactory(String targetType){
+
+        if (targetFactoryMap == null || targetFactoryMap.isEmpty()){
+            return null;
+        }
+
+        return targetFactoryMap.get(CommonCons.TARGET_PREFIX + targetType);
+    }
+
+    private TaskRuleFactory getTaskRuleFactory(String targetType){
+        if (taskRuleFactoryMap == null || taskRuleFactoryMap.isEmpty()){
+            return null;
+        }
+
+        return taskRuleFactoryMap.get(CommonCons.TASK_RULE_PREFIX + targetType);
+    }
+
+    private EntryHandlerFactory getEntryHandlerFactory(String targetType){
+        if (entryHandlerFactoryMap == null || entryHandlerFactoryMap.isEmpty()){
+            return null;
+        }
+
+        return entryHandlerFactoryMap.get(CommonCons.ENTRY_HANDLER_FACTORY_PREFIX + targetType);
     }
 }

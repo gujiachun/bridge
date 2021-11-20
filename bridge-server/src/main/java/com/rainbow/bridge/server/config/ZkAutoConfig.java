@@ -11,7 +11,6 @@ import com.rainbow.bridge.core.zk.BridgeZkSerializer;
 import com.rainbow.bridge.core.zk.ZkClientExt;
 import com.rainbow.bridge.server.listener.ServerZkChildListener;
 import com.rainbow.bridge.server.listener.ServerZkDataListener;
-import org.apache.catalina.Cluster;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.*;
 
 /**
+ * zookeeper协调业务 配置
  * @author gujiachun
  */
 @Configuration
@@ -117,7 +117,4 @@ public class ZkAutoConfig {
 
         return zkc;
     }
-
-
-
 }

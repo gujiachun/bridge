@@ -4,8 +4,13 @@ import freemarker.cache.StringTemplateLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * freemark引擎 配置
+ *@author gujiachun
+ *@date 2021/11/19 9:25 上午
+*/
 @Configuration
-public class TemplateConfig {
+public class TemplateAutoConfig {
 
     @Bean
     public freemarker.template.Configuration configuration() {

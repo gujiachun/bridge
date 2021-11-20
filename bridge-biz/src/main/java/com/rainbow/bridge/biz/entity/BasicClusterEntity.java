@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -19,9 +18,7 @@ import java.util.Date;
  */
 @TableName("basic_cluster")
 @ApiModel(value="BasicClusterEntity对象", description="集群")
-public class BasicClusterEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class BasicClusterEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)

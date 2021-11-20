@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
-
 /**
  * <p>
  * mq关联基础表
@@ -18,9 +16,7 @@ import java.io.Serializable;
  */
 @TableName("basic_mq")
 @ApiModel(value="BasicMqEntity对象", description="mq关联基础表")
-public class BasicMqEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class BasicMqEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)

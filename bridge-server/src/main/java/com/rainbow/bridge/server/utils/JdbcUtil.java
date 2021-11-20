@@ -1,6 +1,10 @@
 package com.rainbow.bridge.server.utils;
 
 import com.rainbow.bridge.core.entity.*;
+import com.rainbow.bridge.server.model.action.DeleteMysqlParam;
+import com.rainbow.bridge.server.model.action.Param;
+import com.rainbow.bridge.server.model.action.InsertMysqlParam;
+import com.rainbow.bridge.server.model.action.UpdateMysqlParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +19,7 @@ public class JdbcUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcUtil.class);
 
-    public static int _update(DataSource ds,List<UpdateEntity> entities) throws SQLException {
+    public static int _update(DataSource ds,List<Param> entities) throws SQLException {
         if (entities == null || entities.size() == 0){
             return 0;
         }
@@ -27,7 +31,7 @@ public class JdbcUtil {
         return update(ds,entities);
     }
 
-    public static int _insert(DataSource ds,List<InsertEntity> entities) throws SQLException {
+    public static int _insert(DataSource ds,List<Param> entities) throws SQLException {
         if (entities == null || entities.size() == 0){
             return 0;
         }
@@ -39,7 +43,7 @@ public class JdbcUtil {
         return insert(ds,entities);
     }
 
-    public static int _delete(DataSource ds,List<DeleteEntity> entities) throws SQLException {
+    public static int _delete(DataSource ds,List<Param> entities) throws SQLException {
         if (entities == null || entities.size() == 0){
             return 0;
         }
@@ -51,8 +55,8 @@ public class JdbcUtil {
         return delete(ds,entities);
     }
 
-    public static int insert(DataSource ds, List<InsertEntity> entities) throws SQLException {
-        if (entities == null || entities.size() == 0){
+    public static int insert(DataSource ds, List<Param> batchOprList) throws SQLException {
+        if (batchOprList == null || batchOprList.size() == 0){
             return 0;
         }
 
@@ -64,7 +68,7 @@ public class JdbcUtil {
             // 获得连接
             conn = ds.getConnection();
             conn.setAutoCommit(false);
-            for (InsertEntity entity : entities) {
+            for (Param entity : batchOprList) {
                 pst = buildInsertStatement(conn, entity);
                 if (pst != null) {
                     // 执行
@@ -83,7 +87,7 @@ public class JdbcUtil {
 
     }
 
-    public static int update(DataSource ds, List<UpdateEntity> entities) throws SQLException {
+    public static int update(DataSource ds, List<Param> entities) throws SQLException {
         if (entities == null || entities.size() == 0){
             return 0;
         }
@@ -96,7 +100,7 @@ public class JdbcUtil {
             // 获得连接
             conn = ds.getConnection();
             conn.setAutoCommit(false);
-            for (UpdateEntity entity : entities) {
+            for (Param entity : entities) {
                 pst = buildUpdateStatement(conn, entity);
                 if (pst != null) {
                     // 执行
@@ -115,7 +119,7 @@ public class JdbcUtil {
 
     }
 
-    public static int delete(DataSource ds, List<DeleteEntity> entities) throws SQLException {
+    public static int delete(DataSource ds, List<Param> entities) throws SQLException {
         if (entities == null || entities.size() == 0){
             return 0;
         }
@@ -128,7 +132,7 @@ public class JdbcUtil {
             // 获得连接
             conn = ds.getConnection();
             conn.setAutoCommit(false);
-            for (DeleteEntity entity : entities) {
+            for (Param entity : entities) {
                 pst = buildDeleteStatement(conn, entity);
                 if (pst != null) {
                     // 执行
@@ -173,8 +177,10 @@ public class JdbcUtil {
         }
     }
 
-    private static PreparedStatement buildDeleteStatement(Connection conn,DeleteEntity entity) throws SQLException {
+    private static PreparedStatement buildDeleteStatement(Connection conn,Param param) throws SQLException {
         StringBuilder sb = new StringBuilder();
+
+        DeleteMysqlParam entity = (DeleteMysqlParam) param;
 
         //直接删除
         if (entity.getDeleteStrategy() == 0){
@@ -298,8 +304,10 @@ public class JdbcUtil {
         return null;
     }
 
-    private static PreparedStatement buildUpdateStatement(Connection conn,UpdateEntity entity) throws SQLException {
+    private static PreparedStatement buildUpdateStatement(Connection conn,Param param) throws SQLException {
         StringBuilder sb = new StringBuilder();
+
+        UpdateMysqlParam entity = (UpdateMysqlParam) param;
         //组装表
         sb.append("update ").append(entity.getTableName()).append(" ");
         //组装set
@@ -342,10 +350,13 @@ public class JdbcUtil {
         }
     }
 
-    private static PreparedStatement buildInsertStatement(Connection conn,InsertEntity entity) throws SQLException {
+    private static PreparedStatement buildInsertStatement(Connection conn, Param param) throws SQLException {
         StringBuilder sb = new StringBuilder();
 
         StringBuilder sbValues = new StringBuilder();
+
+        InsertMysqlParam entity = (InsertMysqlParam) param;
+
         //组装表
         sb.append("insert into ").append(entity.getTableName()).append("( ");
 
@@ -405,7 +416,7 @@ public class JdbcUtil {
         }
     }
 
-    public static int delete(DataSource ds, DeleteEntity entity) throws SQLException {
+    public static int delete(DataSource ds, Param param) throws SQLException {
         // 受影响的行数
         int affectedLine = 0;
         Connection conn = null;
@@ -413,7 +424,7 @@ public class JdbcUtil {
         try {
             // 获得连接
             conn = ds.getConnection();
-            pst = buildDeleteStatement(conn,entity);
+            pst = buildDeleteStatement(conn,param);
             if (pst != null){
                 // 执行
                 affectedLine = pst.executeUpdate();
@@ -427,7 +438,7 @@ public class JdbcUtil {
         return affectedLine;
     }
 
-    public static int update(DataSource ds, UpdateEntity entity) throws SQLException {
+    public static int update(DataSource ds, Param param) throws SQLException {
         // 受影响的行数
         int affectedLine = 0;
         Connection conn = null;
@@ -435,7 +446,7 @@ public class JdbcUtil {
         try {
             // 获得连接
             conn = ds.getConnection();
-            pst = buildUpdateStatement(conn,entity);
+            pst = buildUpdateStatement(conn,param);
             if (pst != null){
                 // 执行
                 affectedLine = pst.executeUpdate();
@@ -449,7 +460,7 @@ public class JdbcUtil {
         return affectedLine;
     }
 
-    public static int insert(DataSource ds, InsertEntity entity) throws SQLException {
+    public static int insert(DataSource ds, Param param) throws SQLException {
         // 受影响的行数
         int affectedLine = 0;
         Connection conn = null;
@@ -457,7 +468,7 @@ public class JdbcUtil {
         try {
             // 获得连接
             conn = ds.getConnection();
-            pst = buildInsertStatement(conn,entity);
+            pst = buildInsertStatement(conn,param);
             if (pst != null){
                 // 执行
                 affectedLine = pst.executeUpdate();

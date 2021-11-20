@@ -1,27 +1,22 @@
 package com.rainbow.bridge.server.handler;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.rainbow.bridge.biz.entity.*;
 import com.rainbow.bridge.biz.service.*;
 import com.rainbow.bridge.canal.CanalClient;
 import com.rainbow.bridge.core.constant.CommonCons;
-import com.rainbow.bridge.core.enums.StatusEnum;
-import com.rainbow.bridge.core.enums.TargetTypeEnum;
 import com.rainbow.bridge.core.model.TaskDto;
 import com.rainbow.bridge.core.utils.IpLocalUtil;
 import com.rainbow.bridge.core.zk.SimpleDistributedLockImpl;
 import com.rainbow.bridge.core.zk.ZkClientExt;
 import com.rainbow.bridge.server.factory.CanalClientFactory;
-import com.rainbow.bridge.server.factory.MysqlDataSourceFactory;
-import com.rainbow.bridge.server.factory.RedisFactory;
-import com.rainbow.bridge.server.factory.TaskRuleFactory;
+import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -49,12 +44,6 @@ public class TaskHandler {
     private ZkClientExt zkClientExt;
 
     @Autowired
-    private TaskMysqlRuleService taskMysqlRuleService;
-
-    @Autowired
-    private TaskRedisRuleService taskRedisRuleService;
-
-    @Autowired
     private TaskService taskService;
 
     @Autowired
@@ -67,13 +56,10 @@ public class TaskHandler {
     private CanalClientFactory canalClientFactory;
 
     @Autowired
-    private MysqlDataSourceFactory mysqlDataSourceFactory;
+    private Map<String, TargetFactory> targetFactoryMap;
 
     @Autowired
-    private RedisFactory redisFactory;
-
-    @Autowired
-    private TaskRuleFactory taskRuleFactory;
+    private Map<String, TaskRuleFactory> taskRuleFactoryMap;
 
     @Value("${server.port}")
     private Integer port;
@@ -216,10 +202,10 @@ public class TaskHandler {
             logger.info("集群任务发生变化了，更新任务规则开始.....");
             for (TaskDto taskDto : updateTaskList){
                 logger.info("集群任务发生变化了，更新任务规则:{}",taskDto.getTaskId());
-                if (CommonCons.mysql.equals(taskDto.getTargetType())){
-                    taskRuleFactory.refreshMysqlTask(taskDto.getTaskId());
-                }else if(CommonCons.redis.equals(taskDto.getTargetType())){
-                    taskRuleFactory.refreshRedisTask(taskDto.getTaskId());
+
+                TaskRuleFactory taskRuleFactory = getTaskRuleFactory(taskDto.getTargetType());
+                if (taskRuleFactory != null){
+                    taskRuleFactory.reloadTaskRules(taskDto.getTaskId());
                 }
             }
         }
@@ -254,15 +240,30 @@ public class TaskHandler {
                 zkClientExt.delete(zkEsTaskMap.get(taskDto.getTaskId()));
                 //移除任务和节点关联
                 zkEsTaskMap.remove(taskDto.getTaskId());
-                if (CommonCons.mysql.equals(taskDto.getTargetType())){
-                    mysqlDataSourceFactory.removeDataSource(taskDto.getTaskId());
-                    taskRuleFactory.removeMysqlTask(taskDto.getTaskId());
-                }else if (CommonCons.redis.equals(taskDto.getTargetType())){
-                    redisFactory.removeRedisService(taskDto.getTaskId());
-                    taskRuleFactory.removeRedisTask(taskDto.getTaskId());
+
+                TargetFactory targetFactory = getTargetFactory(taskDto.getTargetType());
+                if (targetFactory != null){
+                    targetFactory.removeTarget(taskDto.getTaskId());
                 }
             }
         }
+    }
+
+    private TargetFactory getTargetFactory(String targetType){
+
+        if (targetFactoryMap == null || targetFactoryMap.isEmpty()){
+            return null;
+        }
+
+        return targetFactoryMap.get(CommonCons.TARGET_PREFIX + targetType);
+    }
+
+    private TaskRuleFactory getTaskRuleFactory(String targetType){
+        if (taskRuleFactoryMap == null || taskRuleFactoryMap.isEmpty()){
+            return null;
+        }
+
+        return taskRuleFactoryMap.get(CommonCons.TASK_RULE_PREFIX + targetType);
     }
 
     /**
@@ -286,7 +287,7 @@ public class TaskHandler {
         //获取正在执行的任务
         Map<String, CanalClient> taskCanalClientMap = canalClientFactory.getTaskCanalClientMap();
 
-        if (taskCanalClientMap.size() > 0) {
+        if (taskCanalClientMap != null && taskCanalClientMap.size() > 0) {
             logger.info("集群任务发生变化了，去认领任务了哦-----过滤重复任务");
             //过滤掉 已经处理的任务taskId
             Iterator<TaskDto> iterator = addTaskList.iterator();
@@ -315,7 +316,10 @@ public class TaskHandler {
     }
 
     /**
-     * 构建执行任务，把rockemq或kafka订阅起来
+     * 构建执行任务
+     * 1、把rockemq或kafka订阅起来
+     * 2、构建目标源工厂
+     * 3、构建任务规则工厂
      *@author gujiachun
      *@date 2021/9/28 6:31 下午
      *@param
@@ -333,16 +337,16 @@ public class TaskHandler {
             //订阅rocketmq或kafka;构建CanalClient
             buildCanalClient(taskDto);
 
-            //同步目标处理
-            TargetTypeEnum type = TargetTypeEnum.valueOf(taskDto.getTargetType());
+            //构建 目标源工厂
+            TargetFactory targetFactory = getTargetFactory(taskDto.getTargetType());
+            if (targetFactory != null){
+                targetFactory.build(taskDto.getTaskId());
+            }
 
-            switch (type){
-                case mysql:
-                    buildTargetMysqlDataSources(taskDto);
-                    break;
-                case redis:
-                    buildTargetRedisClients(taskDto);
-                    break;
+            //构建 任务规则工厂
+            TaskRuleFactory taskRuleFactory = getTaskRuleFactory(taskDto.getTargetType());
+            if (taskRuleFactory != null){
+                taskRuleFactory.reloadTaskRules(taskDto.getTaskId());
             }
 
             //处理成功后 增加临时有序节点
@@ -355,46 +359,6 @@ public class TaskHandler {
             zkEsTaskMap.put(taskDto.getTaskId(),esTaskPath);
         }
 
-    }
-
-    /**
-     * 构建 mysql 链接
-     *@author gujiachun
-     *@date 2021/9/29 5:02 下午
-     *@param taskDto
-     *@return void
-    */
-    private void buildTargetMysqlDataSources(TaskDto taskDto){
-
-        QueryWrapper<SyncTaskRuleMysqlEntity> wrapper = new QueryWrapper();
-        wrapper.eq("task_id",taskDto.getTaskId());
-        wrapper.eq("status", StatusEnum.valid.getStatus());
-
-        List<SyncTaskRuleMysqlEntity> syncTaskRuleMysqlEntityList = taskMysqlRuleService.list(wrapper);
-
-        mysqlDataSourceFactory.buildDataSources(syncTaskRuleMysqlEntityList);
-        //随便把规则保存
-        taskRuleFactory.addMysqlTaskRules(taskDto.getTaskId(),syncTaskRuleMysqlEntityList);
-    }
-
-    /**
-     * 构建 redis client
-     *@author gujiachun
-     *@date 2021/9/29 5:02 下午
-     *@param taskDto
-     *@return void
-     */
-    private void buildTargetRedisClients(TaskDto taskDto){
-
-        QueryWrapper<SyncTaskRuleRedisEntity> wrapper = new QueryWrapper();
-        wrapper.eq("task_id",taskDto.getTaskId());
-        wrapper.eq("status", StatusEnum.valid.getStatus());
-
-        List<SyncTaskRuleRedisEntity> syncTaskRuleRedisEntityList = taskRedisRuleService.list(wrapper);
-
-        redisFactory.build(syncTaskRuleRedisEntityList);
-        //随便把规则保存
-        taskRuleFactory.addRedisTaskRules(taskDto.getTaskId(),syncTaskRuleRedisEntityList);
     }
 
     /**

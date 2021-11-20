@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
-
 /**
  * <p>
  * topic关联基础表
@@ -18,9 +16,7 @@ import java.io.Serializable;
  */
 @TableName("basic_topic")
 @ApiModel(value="BasicTopicEntity对象", description="topic关联基础表")
-public class BasicTopicEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class BasicTopicEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)

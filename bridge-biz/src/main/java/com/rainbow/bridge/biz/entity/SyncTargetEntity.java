@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -19,9 +18,7 @@ import java.util.Date;
  */
 @TableName("sync_target")
 @ApiModel(value="SyncTargetEntity对象", description="同步目标数据源")
-public class SyncTargetEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class SyncTargetEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.AUTO)

@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -19,9 +18,7 @@ import java.util.Date;
  */
 @TableName("sync_task")
 @ApiModel(value="SyncTaskEntity对象", description="同步任务")
-public class SyncTaskEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class SyncTaskEntity extends BridgeEntity {
 
     @ApiModelProperty(value = "任务主键，也会用来做消费者的groupId")
     @TableId(value = "id", type = IdType.ASSIGN_ID)
