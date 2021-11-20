@@ -3,7 +3,7 @@ package com.rainbow.bridge.server.handler.entry;
 import com.rainbow.bridge.core.enums.EventEnum;
 import com.rainbow.bridge.model.CanalModel;
 import com.rainbow.bridge.server.adapter.BridgeAdapter;
-import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import com.rainbow.bridge.server.model.action.Param;
 import com.rainbow.bridge.server.model.action.RedisParam;

@@ -13,7 +13,7 @@ import com.rainbow.bridge.handler.EntryHandler;
 import com.rainbow.bridge.handler.MessageHandler;
 import com.rainbow.bridge.handler.impl.AsyncFlatMessageHandlerImpl;
 import com.rainbow.bridge.handler.impl.SyncFlatMessageHandlerImpl;
-import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import com.rainbow.bridge.server.handler.factory.EntryHandlerFactory;
 import freemarker.template.Configuration;

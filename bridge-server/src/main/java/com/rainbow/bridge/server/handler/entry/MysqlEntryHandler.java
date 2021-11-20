@@ -5,7 +5,7 @@ import com.rainbow.bridge.core.enums.EventEnum;
 import com.rainbow.bridge.core.utils.PropertiesUtil;
 import com.rainbow.bridge.model.CanalModel;
 import com.rainbow.bridge.server.adapter.BridgeAdapter;
-import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import com.rainbow.bridge.server.model.action.DeleteMysqlParam;
 import com.rainbow.bridge.server.model.action.Param;

@@ -10,7 +10,7 @@ import com.rainbow.bridge.core.utils.IpLocalUtil;
 import com.rainbow.bridge.core.zk.SimpleDistributedLockImpl;
 import com.rainbow.bridge.core.zk.ZkClientExt;
 import com.rainbow.bridge.server.factory.CanalClientFactory;
-import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

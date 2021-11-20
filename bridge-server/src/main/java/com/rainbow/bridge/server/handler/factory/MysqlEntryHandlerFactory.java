@@ -2,7 +2,7 @@ package com.rainbow.bridge.server.handler.factory;
 
 import com.rainbow.bridge.handler.EntryHandler;
 import com.rainbow.bridge.server.adapter.MysqlBridgeAdapter;
-import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import com.rainbow.bridge.server.handler.entry.MysqlEntryHandler;
 import freemarker.template.Configuration;

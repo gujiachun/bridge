@@ -2,7 +2,7 @@ package com.rainbow.bridge.server.handler.factory;
 
 import com.rainbow.bridge.handler.EntryHandler;
 import com.rainbow.bridge.server.adapter.RedisBridgeAdapter;
-import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import com.rainbow.bridge.server.handler.entry.RedisEntryHandler;
 import freemarker.template.Configuration;

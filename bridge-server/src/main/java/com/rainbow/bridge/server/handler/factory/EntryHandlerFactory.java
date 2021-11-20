@@ -1,7 +1,7 @@
 package com.rainbow.bridge.server.handler.factory;
 
 import com.rainbow.bridge.handler.EntryHandler;
-import com.rainbow.bridge.server.factory.target.TargetFactory;
+import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
 import freemarker.template.Configuration;
 
