@@ -13,11 +13,7 @@
     <artifactId>bridge-server</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.rainbow.bridge</groupId>
-            <artifactId>bridge-biz</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.rainbow.bridge</groupId>
             <artifactId>bridge-web-starter</artifactId>
@@ -25,12 +21,13 @@
         </dependency>
         <dependency>
             <groupId>com.rainbow.bridge</groupId>
-            <artifactId>bridge-canal-client</artifactId>
+            <artifactId>bridge-target-mysql</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
+            <groupId>com.rainbow.bridge</groupId>
+            <artifactId>bridge-target-redis</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -42,10 +39,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-        </dependency>
-        <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>
@@ -53,19 +46,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-
-        <!--    表达式引擎    -->
-        <dependency>
-            <groupId>com.googlecode.aviator</groupId>
-            <artifactId>aviator</artifactId>
-            <version>5.2.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

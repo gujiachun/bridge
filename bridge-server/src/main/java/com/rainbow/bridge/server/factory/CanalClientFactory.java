@@ -13,9 +13,9 @@ import com.rainbow.bridge.handler.EntryHandler;
 import com.rainbow.bridge.handler.MessageHandler;
 import com.rainbow.bridge.handler.impl.AsyncFlatMessageHandlerImpl;
 import com.rainbow.bridge.handler.impl.SyncFlatMessageHandlerImpl;
-import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
-import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
-import com.rainbow.bridge.server.handler.factory.EntryHandlerFactory;
+import com.rainbow.bridge.targetcore.factory.targetsource.TargetFactory;
+import com.rainbow.bridge.targetcore.factory.taskrule.TaskRuleFactory;
+import com.rainbow.bridge.targetcore.handler.EntryHandlerFactory;
 import freemarker.template.Configuration;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -58,13 +59,13 @@ public class CanalClientFactory {
     }
 
     @Autowired
-    private Map<String, TaskRuleFactory> taskRuleFactoryMap;
+    private List<TaskRuleFactory> taskRuleFactoryList;
 
     @Autowired
-    private Map<String, TargetFactory> targetFactoryMap;
+    private List<TargetFactory> targetFactoryList;
 
     @Autowired
-    private Map<String, EntryHandlerFactory> entryHandlerFactoryMap;
+    private List<EntryHandlerFactory> entryHandlerFactoryList;
 
     @Autowired
     private Configuration freeMarkerConfiguration;
@@ -162,26 +163,42 @@ public class CanalClientFactory {
 
     private TargetFactory getTargetFactory(String targetType){
 
-        if (targetFactoryMap == null || targetFactoryMap.isEmpty()){
+        if (targetFactoryList == null || targetFactoryList.isEmpty()){
             return null;
         }
 
-        return targetFactoryMap.get(CommonCons.TARGET_PREFIX + targetType);
+        for (TargetFactory targetFactory : targetFactoryList){
+            if (targetFactory.support(targetType)){
+                return targetFactory;
+            }
+        }
+
+        return null;
     }
 
     private TaskRuleFactory getTaskRuleFactory(String targetType){
-        if (taskRuleFactoryMap == null || taskRuleFactoryMap.isEmpty()){
+        if (taskRuleFactoryList == null || taskRuleFactoryList.isEmpty()){
             return null;
         }
 
-        return taskRuleFactoryMap.get(CommonCons.TASK_RULE_PREFIX + targetType);
+        for (TaskRuleFactory taskRuleFactory : taskRuleFactoryList){
+            if (taskRuleFactory.support(targetType)){
+                return taskRuleFactory;
+            }
+        }
+        return null;
     }
 
     private EntryHandlerFactory getEntryHandlerFactory(String targetType){
-        if (entryHandlerFactoryMap == null || entryHandlerFactoryMap.isEmpty()){
+        if (entryHandlerFactoryList == null || entryHandlerFactoryList.isEmpty()){
             return null;
         }
 
-        return entryHandlerFactoryMap.get(CommonCons.ENTRY_HANDLER_FACTORY_PREFIX + targetType);
+        for (EntryHandlerFactory entryHandlerFactory : entryHandlerFactoryList){
+            if (entryHandlerFactory.support(targetType)){
+                return entryHandlerFactory;
+            }
+        }
+        return null;
     }
 }

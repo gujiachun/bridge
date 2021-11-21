@@ -4,14 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.rainbow.bridge.biz.entity.*;
 import com.rainbow.bridge.biz.service.*;
 import com.rainbow.bridge.canal.CanalClient;
-import com.rainbow.bridge.core.constant.CommonCons;
 import com.rainbow.bridge.core.model.TaskDto;
 import com.rainbow.bridge.core.utils.IpLocalUtil;
 import com.rainbow.bridge.core.zk.SimpleDistributedLockImpl;
 import com.rainbow.bridge.core.zk.ZkClientExt;
 import com.rainbow.bridge.server.factory.CanalClientFactory;
-import com.rainbow.bridge.server.factory.targetsource.TargetFactory;
-import com.rainbow.bridge.server.factory.taskrule.TaskRuleFactory;
+import com.rainbow.bridge.targetcore.factory.targetsource.TargetFactory;
+import com.rainbow.bridge.targetcore.factory.taskrule.TaskRuleFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +55,10 @@ public class TaskHandler {
     private CanalClientFactory canalClientFactory;
 
     @Autowired
-    private Map<String, TargetFactory> targetFactoryMap;
+    private List<TargetFactory> targetFactoryList;
 
     @Autowired
-    private Map<String, TaskRuleFactory> taskRuleFactoryMap;
+    private List<TaskRuleFactory> taskRuleFactoryList;
 
     @Value("${server.port}")
     private Integer port;
@@ -251,19 +250,31 @@ public class TaskHandler {
 
     private TargetFactory getTargetFactory(String targetType){
 
-        if (targetFactoryMap == null || targetFactoryMap.isEmpty()){
+        if (targetFactoryList == null || targetFactoryList.isEmpty()){
             return null;
         }
 
-        return targetFactoryMap.get(CommonCons.TARGET_PREFIX + targetType);
+        for (TargetFactory targetFactory : targetFactoryList){
+            if (targetFactory.support(targetType)){
+                return targetFactory;
+            }
+        }
+
+        return null;
     }
 
     private TaskRuleFactory getTaskRuleFactory(String targetType){
-        if (taskRuleFactoryMap == null || taskRuleFactoryMap.isEmpty()){
+        if (taskRuleFactoryList == null || taskRuleFactoryList.isEmpty()){
             return null;
         }
 
-        return taskRuleFactoryMap.get(CommonCons.TASK_RULE_PREFIX + targetType);
+        for (TaskRuleFactory taskRuleFactory : taskRuleFactoryList){
+            if (taskRuleFactory.support(targetType)){
+                return taskRuleFactory;
+            }
+        }
+
+        return null;
     }
 
     /**
