@@ -60,9 +60,9 @@ bridge:
   #启动时 可以指定 此实例 可以处理多少任务
   maxTaskCount: 3
   #异步处理任务的线程池 配置
-  threadCorePoolSize: 10
-  threadMaxPoolSize: 20
-  threadQueueSize: 100
+  threadCorePoolSize: 100
+  threadMaxPoolSize: 200
+  threadQueueSize: 1000
 
 ---
 # 测试环境配置
@@ -83,9 +83,9 @@ bridge:
   #启动时 可以指定 此实例 可以处理多少任务
   maxTaskCount: 3
   #异步处理任务的线程池 配置
-  threadCorePoolSize: 10
-  threadMaxPoolSize: 20
-  threadQueueSize: 100
+  threadCorePoolSize: 100
+  threadMaxPoolSize: 200
+  threadQueueSize: 1000
 
 ---
 # 预生产环境配置
@@ -106,9 +106,9 @@ bridge:
   #启动时 可以指定 此实例 可以处理多少任务
   maxTaskCount: 3
   #异步处理任务的线程池 配置
-  threadCorePoolSize: 10
-  threadMaxPoolSize: 20
-  threadQueueSize: 100
+  threadCorePoolSize: 100
+  threadMaxPoolSize: 200
+  threadQueueSize: 1000
 
 ---
 # 生产环境配置
@@ -129,7 +129,7 @@ bridge:
   #启动时 可以指定 此实例 可以处理多少任务
   maxTaskCount: 3
   #异步处理任务的线程池 配置
-  threadCorePoolSize: 10
-  threadMaxPoolSize: 20
-  threadQueueSize: 100
+  threadCorePoolSize: 100
+  threadMaxPoolSize: 200
+  threadQueueSize: 1000
 
