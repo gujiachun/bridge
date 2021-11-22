@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.rainbow.bridge.biz.entity.SyncRedisTargetEntity;
 import com.rainbow.bridge.biz.entity.SyncTaskRuleRedisEntity;
-import com.rainbow.bridge.core.constant.RedisCons;
+import com.rainbow.bridge.redistarget.constant.RedisCons;
 import com.rainbow.bridge.core.enums.StatusEnum;
 import com.rainbow.bridge.core.utils.PropertiesUtil;
 import com.rainbow.bridge.redistarget.client.RedisClusterService;

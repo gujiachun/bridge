@@ -6,9 +6,9 @@ package com.rainbow.bridge.core.constant;
  */
 public class CommonCons {
 
-    public static final String mq_rocketmq_type = "rocketmq";
+    public static final String rocketmq = "rocketmq";
 
-    public static final String mq_kafka_type = "kafka";
+    public static final String kafka = "kafka";
 
     public static final Integer enable = 1;
 

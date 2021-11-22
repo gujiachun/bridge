@@ -110,10 +110,10 @@ public class CanalClientFactory {
 
         AbstractCanalClient client = null;
         //订阅rocketmq或kafka
-        if (CommonCons.mq_kafka_type.equals(basicMqEntity.getMqType())){
+        if (CommonCons.kafka.equals(basicMqEntity.getMqType())){
             client = new KafkaMqCanalClient();
             ((KafkaMqCanalClient)client).setServers(basicMqEntity.getServers());
-        }else if (CommonCons.mq_rocketmq_type.equals(basicMqEntity.getMqType())){
+        }else if (CommonCons.rocketmq.equals(basicMqEntity.getMqType())){
             client = new RocketMqCanalClient();
             ((RocketMqCanalClient)client).setNameServers(basicMqEntity.getServers());
         }

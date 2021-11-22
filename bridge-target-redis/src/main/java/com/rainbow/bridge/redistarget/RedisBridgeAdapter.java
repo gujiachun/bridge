@@ -3,7 +3,7 @@ package com.rainbow.bridge.redistarget;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
-import com.rainbow.bridge.core.constant.RedisCons;
+import com.rainbow.bridge.redistarget.constant.RedisCons;
 import com.rainbow.bridge.core.enums.EventEnum;
 import com.rainbow.bridge.redistarget.client.RedisService;
 import com.rainbow.bridge.redistarget.param.RedisParam;

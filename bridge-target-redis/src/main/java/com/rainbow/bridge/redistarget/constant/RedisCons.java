@@ -1,4 +1,4 @@
-package com.rainbow.bridge.core.constant;
+package com.rainbow.bridge.redistarget.constant;
 
 /**
  * redis常量
