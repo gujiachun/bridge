@@ -28,7 +28,7 @@ spring:
       timeBetweenEvictionRunsMillis: 60000
       validationQuery: SELECT 1
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://${db.host}/${db.database}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${db.host}/${db.database}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&autoReconnect=true&failOverReadOnly=false
     #定义数据库配置
     username: ${db.username}
     password: ${db.password}
