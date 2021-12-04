@@ -55,4 +55,14 @@ public class TaskDto {
     public void setUpdateTaskRuleTime(Date updateTaskRuleTime) {
         this.updateTaskRuleTime = updateTaskRuleTime;
     }
+
+    @Override
+    public String toString() {
+        return "TaskDto{" +
+                "taskId='" + taskId + '\'' +
+                ", targetType='" + targetType + '\'' +
+                ", instCount=" + instCount +
+                ", updateTaskRuleTime=" + updateTaskRuleTime +
+                '}';
+    }
 }

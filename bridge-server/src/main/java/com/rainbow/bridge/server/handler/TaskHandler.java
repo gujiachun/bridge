@@ -6,6 +6,7 @@ import com.rainbow.bridge.biz.service.*;
 import com.rainbow.bridge.canal.CanalClient;
 import com.rainbow.bridge.core.model.TaskDto;
 import com.rainbow.bridge.core.utils.IpLocalUtil;
+import com.rainbow.bridge.core.utils.MysqlJavaTypeMapping;
 import com.rainbow.bridge.core.zk.SimpleDistributedLockImpl;
 import com.rainbow.bridge.core.zk.ZkClientExt;
 import com.rainbow.bridge.server.factory.CanalClientFactory;
@@ -90,10 +91,13 @@ public class TaskHandler {
             return;
         }
 
+        //需要做的任务
         List<TaskDto> taskList = JSON.parseArray(tasks, TaskDto.class);
 
         //获取集群节点 下 所有的任务实例
         List<String> taskPathChildren = zkClientExt.getChildren(zkClientExt.getClusterPath());
+
+        logger.info("当前集群:{} 已经拥有了任务:{}",zkClientExt.getClusterPath(),taskPathChildren.toString());
 
         if (addTaskList == null){
             addTaskList = new ArrayList<>();
@@ -107,6 +111,7 @@ public class TaskHandler {
             updateTaskList = new ArrayList<>();
         }
 
+        // 当前任务 是不是实例数 有变化了
         for (TaskDto taskDto : taskList){
             //当前task任务实例数
             int taskPathCount = getTaskPathCount(taskPathChildren, taskDto.getTaskId());
@@ -126,6 +131,40 @@ public class TaskHandler {
                 updateTaskList.add(taskDto);
             }
         }
+
+        if (taskPathChildren == null && taskPathChildren.size() <= 0){
+            return;
+        }
+        //看看 是不是 剔除了任务
+        for (String taskIdPath : taskPathChildren){
+            //此任务没有剔除，继续要处理此任务
+            boolean contineAcitonTaskId = false;
+            for (TaskDto taskDto : taskList){
+                if (taskIdPath.indexOf(taskDto.getTaskId()) == 0){
+                    contineAcitonTaskId = true;
+                    break;
+                }
+            }
+            //不存在 集群任务中，需要剔除
+            if (!contineAcitonTaskId){
+                logger.info(">>>>>读取临时任务节点的数据:{}",zkClientExt.getClusterPath() + "/" + taskIdPath);
+                Object o = zkClientExt.readData(zkClientExt.getClusterPath() + "/" + taskIdPath, true);
+                if ( o != null){
+                    String data = o.toString();
+                    logger.info(">>>>>读取临时任务节点:{},数据:{}",zkClientExt.getClusterPath() + "/" + taskIdPath,data);
+                    String[] split = data.split(",");
+                    logger.info(">>>>>读取临时任务节点:{},数据:{},split:{}",zkClientExt.getClusterPath() + "/" + taskIdPath,data,split.length);
+                    TaskDto taskDto = new TaskDto();
+                    taskDto.setTaskId(split[2]);
+                    taskDto.setTargetType(split[3]);
+                    taskDto.setInstCount(Integer.valueOf(split[4]));
+                    taskDto.setUpdateTaskRuleTime(MysqlJavaTypeMapping.stringToDate(split[1]));
+                    delTaskList.add(taskDto);
+                    logger.info(">>>>>剔除列表数量:{}",delTaskList.size());
+                }
+            }
+        }
+
     }
 
     /**
@@ -173,6 +212,10 @@ public class TaskHandler {
             List<TaskDto> updateTaskList = new ArrayList<>();
             //检查需要做的任务
             checkTodoTasks(addTaskList,delTaskList,updateTaskList);
+
+            logger.info(">>>>>>需要addTask---->数量：{},data:{}",addTaskList.size(),addTaskList.toString());
+            logger.info(">>>>>>需要updateTask---->数量：{},data:{}",updateTaskList.size(),updateTaskList.toString());
+            logger.info(">>>>>>需要deleteTask---->数量：{},data:{}",delTaskList.size(),delTaskList.toString());
 
             buildDeleteTasks(delTaskList);
 
@@ -363,9 +406,10 @@ public class TaskHandler {
             //处理成功后 增加临时有序节点
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String formatDate = simpleDateFormat.format(taskDto.getUpdateTaskRuleTime());
+            String content = String.format("%s,%s,%s,%s,%s",IpLocalUtil.getLocalIpByNetcard() + ":" + port,
+                    formatDate,taskDto.getTaskId(),taskDto.getTargetType(),taskDto.getInstCount());
             //任务临时节点 和 任务id的关联关系
-            String esTaskPath = zkClientExt.createEphemeralSequential(zkClientExt.getClusterPath() + "/" + taskDto.getTaskId(),
-                    IpLocalUtil.getLocalIpByNetcard() + ":" + port + "," + formatDate);
+            String esTaskPath = zkClientExt.createEphemeralSequential(zkClientExt.getClusterPath() + "/" + taskDto.getTaskId(),content);
             logger.info(">>>>>taskId:{}产生了临时节点:{}",taskDto.getTaskId(),esTaskPath);
             zkEsTaskMap.put(taskDto.getTaskId(),esTaskPath);
         }
