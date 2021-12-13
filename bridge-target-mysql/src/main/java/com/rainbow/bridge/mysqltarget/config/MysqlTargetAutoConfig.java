@@ -1,8 +1,7 @@
 package com.rainbow.bridge.mysqltarget.config;
 
-import com.rainbow.bridge.biz.service.MysqlTargetService;
-import com.rainbow.bridge.biz.service.TaskMysqlRuleService;
-import com.rainbow.bridge.core.constant.CommonCons;
+import com.rainbow.bridge.biz.service.mysql.MysqlTargetService;
+import com.rainbow.bridge.biz.service.mysql.TaskMysqlRuleService;
 import com.rainbow.bridge.core.constant.TargetType;
 import com.rainbow.bridge.mysqltarget.MysqlTargetFactory;
 import com.rainbow.bridge.mysqltarget.MysqlTaskRuleFactory;

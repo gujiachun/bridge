@@ -3,7 +3,7 @@ package com.rainbow.bridge.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.rainbow.bridge.biz.dto.RedisTargetDto;
 import com.rainbow.bridge.biz.dto.query.TargetQueryDto;
-import com.rainbow.bridge.biz.service.RedisTargetService;
+import com.rainbow.bridge.biz.service.redis.RedisTargetService;
 import com.rainbow.bridge.core.PageResult;
 import com.rainbow.bridge.core.Result;
 import lombok.RequiredArgsConstructor;

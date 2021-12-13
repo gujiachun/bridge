@@ -2,8 +2,8 @@ package com.rainbow.bridge.redistarget;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.rainbow.bridge.biz.entity.SyncRedisTargetEntity;
-import com.rainbow.bridge.biz.entity.SyncTaskRuleRedisEntity;
+import com.rainbow.bridge.biz.entity.redis.SyncRedisTargetEntity;
+import com.rainbow.bridge.biz.entity.redis.SyncTaskRuleRedisEntity;
 import com.rainbow.bridge.redistarget.constant.RedisCons;
 import com.rainbow.bridge.core.enums.StatusEnum;
 import com.rainbow.bridge.core.utils.PropertiesUtil;
@@ -41,6 +41,7 @@ public class RedisTargetFactory extends AbsTargetFactory<RedisService> {
 
     @Override
     protected RedisService initTargetConn(TargetConn targetConn) {
+        logger.info(">>>>初始化redis目标client,目标数据源:{}",targetConn.getTargetId());
         Map<String, String> map = PropertiesUtil.stringToMap(targetConn.getProps());
         try {
             Integer mode = ((RedisTargetConn) targetConn).getMode();
@@ -52,7 +53,6 @@ public class RedisTargetFactory extends AbsTargetFactory<RedisService> {
             }else if (RedisCons.cluster.equals(mode)){
                 return createCluster(map);
             }
-            logger.info("初始redis目标client成功,目标数据源:{}",targetConn.getTargetId());
         } catch (Exception e) {
             logger.error("初始redis目标client发生异常，目标数据源:{},异常:{}",targetConn.getTargetId(),e.getMessage());
         }

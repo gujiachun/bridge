@@ -38,30 +38,10 @@ public class RedisEntryHandler extends AbsEntryHandler {
     }
 
     @Override
-    public void insertBatchOpr(Integer targetId, List<Param> params) throws Exception {
-        return;
-    }
-
-    @Override
-    public void insertOpr(Integer targetId, Param param) throws Exception {
-        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.insert,param);
-    }
-
-    @Override
     public Param buildUpdateParam(String targetType, Integer targetId, String taskId, TargetFactory targetFactory,
                                   TaskRuleFactory taskRuleFactory, TaskRule taskRule, CanalModel model,
                                   Map<String, String> mysqlType, Map<String, Object> before, Map<String, Object> after) throws Exception {
         return buildParam(taskRule,targetId,after);
-    }
-
-    @Override
-    public void updateOpr(Integer targetId, Param param) throws Exception {
-        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.update,param);
-    }
-
-    @Override
-    public void updateBatchOpr(Integer targetId, List<Param> params) throws Exception {
-        return;
     }
 
     @Override
@@ -70,16 +50,6 @@ public class RedisEntryHandler extends AbsEntryHandler {
                                   Map<String, String> mysqlType, Map<String, Object> values) throws Exception {
 
         return buildParam(taskRule,targetId,values);
-    }
-
-    @Override
-    public void deleteOpr(Integer targetId, Param param) throws Exception {
-        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.delete, param);
-    }
-
-    @Override
-    public void deleteBatchOpr(Integer targetId, List<Param> params) throws Exception {
-        return;
     }
 
     private Param buildParam(TaskRule taskRule, Integer targetId, Map<String, Object> values) throws Exception {

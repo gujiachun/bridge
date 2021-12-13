@@ -10,6 +10,11 @@ public class Param {
 
     protected Integer targetId;
 
+    public Param(String taskId, Integer targetId) {
+        this.taskId = taskId;
+        this.targetId = targetId;
+    }
+
     public Integer getTargetId() {
         return targetId;
     }

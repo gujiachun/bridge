@@ -11,6 +11,12 @@ public class MysqlParam extends Param {
 
     protected String tableName;
 
+    public MysqlParam(String taskId, Integer targetId, String database, String tableName) {
+        super(taskId, targetId);
+        this.database = database;
+        this.tableName = tableName;
+    }
+
     public String getDatabase() {
         return database;
     }

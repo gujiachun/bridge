@@ -16,10 +16,7 @@ public class UpdateMysqlParam extends MysqlParam {
     private List<Column> columnList;
 
     public UpdateMysqlParam(String taskId, Integer targetId,String db,String tableName){
-        this.tableName = tableName;
-        this.targetId = targetId;
-        this.taskId = taskId;
-        this.database = db;
+        super(taskId,targetId,db,tableName);
         this.pkList = new ArrayList<>();
         this.columnList = new ArrayList<>();
     }

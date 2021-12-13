@@ -74,4 +74,38 @@ public class PropertiesUtil {
         }
         return null;
     }
+
+    /**
+     * 指定 分隔符 转换
+     *@author gujiachun
+     *@date 2021/12/9 10:53 上午
+     *@param str
+     *@param splitStr
+     *@return java.util.Map<java.lang.String,java.lang.String>
+    */
+    public static Map<String, String> stringToMap(String str,String splitStr){
+        if (StringUtils.isNotBlank(str)){
+            Map<String, String> map = new HashMap<>(20);
+            String[] split = str.split(splitStr);
+            for (String s : split){
+                if (StringUtils.isNotBlank(s)){
+                    int pos = s.indexOf('=');
+
+                    String k;
+                    String v;
+                    if (pos > 0){
+                        k = s.substring(0,pos);
+                        v = s.substring(pos + 1);
+                    }else{
+                        k = s;
+                        v = s;
+                    }
+
+                    map.put(k.trim(),v.trim());
+                }
+            }
+            return map;
+        }
+        return null;
+    }
 }

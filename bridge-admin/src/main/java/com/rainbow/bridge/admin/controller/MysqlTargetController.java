@@ -3,7 +3,7 @@ package com.rainbow.bridge.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.rainbow.bridge.biz.dto.MysqlTargetDto;
 import com.rainbow.bridge.biz.dto.query.TargetQueryDto;
-import com.rainbow.bridge.biz.service.MysqlTargetService;
+import com.rainbow.bridge.biz.service.mysql.MysqlTargetService;
 import com.rainbow.bridge.core.PageResult;
 import com.rainbow.bridge.core.Result;
 import lombok.RequiredArgsConstructor;

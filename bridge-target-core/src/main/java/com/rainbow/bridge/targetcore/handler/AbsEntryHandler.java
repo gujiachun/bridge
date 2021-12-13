@@ -1,6 +1,7 @@
 package com.rainbow.bridge.targetcore.handler;
 
 import com.googlecode.aviator.AviatorEvaluator;
+import com.rainbow.bridge.core.enums.EventEnum;
 import com.rainbow.bridge.core.utils.PublicUtil;
 import com.rainbow.bridge.handler.EntryHandler;
 import com.rainbow.bridge.model.CanalModel;
@@ -70,8 +71,8 @@ public abstract class AbsEntryHandler implements EntryHandler {
 
             for (TaskRule taskRule : targetTaskRules){
                 //配对源头
-                if (model.getDatabase().equals(taskRule.getSourceDb()) &&
-                        model.getTable().equals(taskRule.getSourceTable())){
+                if (checkSource(taskRule,model)){
+
                     int filter = 0;
                     //针对 新增的值 动态的表达式
                     if (StringUtils.isNotBlank(taskRule.getInsertSourceConditionFilter())){
@@ -121,7 +122,16 @@ public abstract class AbsEntryHandler implements EntryHandler {
      *@param params 批量执行新增的所需参数
      *@return void
      */
-    public abstract void insertBatchOpr(Integer targetId,List<Param> params) throws Exception;
+    public void insertBatchOpr(Integer targetId,List<Param> params) throws Exception {
+        if (!batchTran){
+            return;
+        }
+
+        if (params == null){
+            return;
+        }
+        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.insert,params);
+    }
 
     /**
      * batchTran为false时，执行单次操作
@@ -132,7 +142,12 @@ public abstract class AbsEntryHandler implements EntryHandler {
      *@param param 执行新增的所需参数
      *@return void
      */
-    public abstract void insertOpr(Integer targetId,Param param) throws Exception;
+    public void insertOpr(Integer targetId,Param param) throws Exception {
+        if (batchTran){
+            return;
+        }
+        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.insert,param);
+    }
 
     /**
      * 构建 新增事件同步 参数
@@ -173,8 +188,7 @@ public abstract class AbsEntryHandler implements EntryHandler {
             for (TaskRule taskRule : targetTaskRules){
 
                 //配对源头
-                if (model.getDatabase().equals(taskRule.getSourceDb()) &&
-                        model.getTable().equals(taskRule.getSourceTable())){
+                if (checkSource(taskRule,model)){
 
                     int filter = 0;
                     //针对 修改前的值 动态的表达式
@@ -236,7 +250,16 @@ public abstract class AbsEntryHandler implements EntryHandler {
      *@param params 批量执行参数
      *@return void
      */
-    public abstract void updateBatchOpr(Integer targetId,List<Param> params) throws Exception;
+    public void updateBatchOpr(Integer targetId,List<Param> params) throws Exception {
+        if (!batchTran){
+            return;
+        }
+
+        if (params == null){
+            return;
+        }
+        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.update,params);
+    }
 
     /**
      * batchTran为false时，执行单次操作
@@ -247,7 +270,13 @@ public abstract class AbsEntryHandler implements EntryHandler {
      *@param param 执行参数
      *@return void
     */
-    public abstract void updateOpr(Integer targetId,Param param) throws Exception;
+    public void updateOpr(Integer targetId,Param param) throws Exception {
+        if (batchTran){
+            return;
+        }
+
+        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.update,param);
+    }
 
     /**
      * 构建 修改事件同步 参数
@@ -289,8 +318,7 @@ public abstract class AbsEntryHandler implements EntryHandler {
             for (TaskRule taskRule : targetTaskRules){
 
                 //配对源头
-                if (model.getDatabase().equals(taskRule.getSourceDb()) &&
-                        model.getTable().equals(taskRule.getSourceTable())){
+                if (checkSource(taskRule,model)){
 
                     int filter = 0;
                     //针对 修改前的值 动态的表达式
@@ -343,7 +371,16 @@ public abstract class AbsEntryHandler implements EntryHandler {
      *@param params 执行参数
      *@return void
      */
-    public abstract void deleteBatchOpr(Integer targetId,List<Param> params) throws Exception;
+    public void deleteBatchOpr(Integer targetId,List<Param> params) throws Exception {
+        if (!batchTran){
+            return;
+        }
+
+        if (params == null){
+            return;
+        }
+        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.delete,params);
+    }
 
     /**
      * batchTran为false时，执行单次操作
@@ -354,7 +391,12 @@ public abstract class AbsEntryHandler implements EntryHandler {
      *@param param 执行参数
      *@return void
     */
-    public abstract void deleteOpr(Integer targetId,Param param) throws Exception;
+    public void deleteOpr(Integer targetId,Param param) throws Exception {
+        if (batchTran){
+            return;
+        }
+        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.delete, param);
+    }
 
     /**
      * 构建 删除事件同步参数
@@ -381,5 +423,29 @@ public abstract class AbsEntryHandler implements EntryHandler {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 检查是否 与源配对
+     *@author gujiachun
+     *@date 2021/12/9 9:44 上午
+     *@param taskRule
+     *@param model
+     *@return boolean
+    */
+    private boolean checkSource(TaskRule taskRule,CanalModel model){
+        if (!model.getDatabase().equals(taskRule.getSourceDb())){
+            return false;
+        }
+        if (StringUtils.isBlank(taskRule.getSourceTable())){
+            return true;
+        }
+        String[] split = taskRule.getSourceTable().split(",");
+        for (String t : split){
+            if (t.equals(model.getTable())){
+                return true;
+            }
+        }
+        return false;
     }
 }

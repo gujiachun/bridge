@@ -19,10 +19,7 @@ public class InsertMysqlParam extends MysqlParam {
     private List<OriginCol> originColList;
 
     public InsertMysqlParam(String taskId, Integer targetId, String db, String tableName){
-        this.tableName = tableName;
-        this.targetId = targetId;
-        this.taskId = taskId;
-        this.database = db;
+        super(taskId,targetId,db,tableName);
         this.pkList = new ArrayList<>();
         this.columnList = new ArrayList<>();
         this.originColList = new ArrayList<>();

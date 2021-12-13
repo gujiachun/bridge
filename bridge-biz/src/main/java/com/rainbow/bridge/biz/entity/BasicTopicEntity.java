@@ -31,6 +31,9 @@ public class BasicTopicEntity extends BridgeEntity {
     @ApiModelProperty(value = "描述")
     private String remark;
 
+    @ApiModelProperty(value = "源id")
+    private Integer sourceId;
+
     @ApiModelProperty(value = "同步库名")
     private String syncDb;
 
@@ -90,16 +93,25 @@ public class BasicTopicEntity extends BridgeEntity {
         this.env = env;
     }
 
+    public Integer getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(Integer sourceId) {
+        this.sourceId = sourceId;
+    }
+
     @Override
     public String toString() {
         return "BasicTopicEntity{" +
-            "id=" + id +
-            ", topic=" + topic +
-            ", mqId=" + mqId +
-            ", remark=" + remark +
-            ", syncDb=" + syncDb +
-            ", syncTable=" + syncTable +
-            ", env=" + env +
-        "}";
+                "id=" + id +
+                ", topic='" + topic + '\'' +
+                ", mqId=" + mqId +
+                ", remark='" + remark + '\'' +
+                ", sourceId=" + sourceId +
+                ", syncDb='" + syncDb + '\'' +
+                ", syncTable='" + syncTable + '\'' +
+                ", env='" + env + '\'' +
+                '}';
     }
 }

@@ -84,19 +84,6 @@ public class MysqlEntryHandler extends AbsEntryHandler {
     }
 
     @Override
-    public void insertBatchOpr(Integer targetId, List<Param> params) throws Exception {
-        if (params == null){
-            return;
-        }
-        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.insert,params);
-    }
-
-    @Override
-    public void insertOpr(Integer targetId, Param param) throws Exception {
-        return;
-    }
-
-    @Override
     public Param buildUpdateParam(String targetType, Integer targetId, String taskId, TargetFactory targetFactory,
                                   TaskRuleFactory taskRuleFactory, TaskRule taskRule, CanalModel model,
                                   Map<String, String> mysqlType, Map<String, Object> before, Map<String, Object> after) throws Exception {
@@ -140,19 +127,6 @@ public class MysqlEntryHandler extends AbsEntryHandler {
             return param;
         }
         return null;
-    }
-
-    @Override
-    public void updateBatchOpr(Integer targetId, List<Param> params) throws Exception {
-        if (params == null){
-            return;
-        }
-        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.update,params);
-    }
-
-    @Override
-    public void updateOpr(Integer targetId, Param param) throws Exception {
-        return;
     }
 
     @Override
@@ -212,16 +186,4 @@ public class MysqlEntryHandler extends AbsEntryHandler {
         return null;
     }
 
-    @Override
-    public void deleteBatchOpr(Integer targetId, List<Param> params) throws Exception {
-        if (params == null){
-            return;
-        }
-        bridgeAdapter.execute(targetFactory.getTarget(targetId), EventEnum.delete,params);
-    }
-
-    @Override
-    public void deleteOpr(Integer targetId, Param param) throws Exception {
-        return;
-    }
 }

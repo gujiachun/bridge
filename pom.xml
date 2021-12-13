@@ -7,7 +7,7 @@
     <groupId>com.rainbow.bridge</groupId>
     <artifactId>bridge</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
     <modules>
         <module>bridge-core</module>
         <module>bridge-web-starter</module>
@@ -16,6 +16,7 @@
         <module>bridge-target-core</module>
         <module>bridge-target-mysql</module>
         <module>bridge-target-redis</module>
+        <module>bridge-target-elasticsearch</module>
         <module>bridge-server</module>
         <module>bridge-admin</module>
     </modules>
@@ -34,6 +35,7 @@
         <lombok.version>1.18.20</lombok.version>
         <mybatis.plus.starter.version>3.4.3.4</mybatis.plus.starter.version>
         <mybatis-plus-generator.version>3.3.2</mybatis-plus-generator.version>
+        <es.version>7.4.2</es.version>
         <joda-time.version>2.10.10</joda-time.version>
         <commons-io.version>2.8.0</commons-io.version>
         <hutool.version>5.1.4</hutool.version>
@@ -114,7 +116,7 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-            <!--easyexcel-->
+            <!--easy excel-->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
@@ -126,16 +128,19 @@
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid-spring-boot-starter.version}</version>
             </dependency>
+            <!--zookeeper-->
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>${zookeeper.version}</version>
             </dependency>
+            <!--thread local-->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>transmittable-thread-local</artifactId>
                 <version>${transmittable-thread-local.version}</version>
             </dependency>
+            <!--canal client-->
             <dependency>
                 <groupId>com.alibaba.otter</groupId>
                 <artifactId>canal.client</artifactId>
@@ -151,6 +156,23 @@
                 <artifactId>canal.protocol</artifactId>
                 <version>${canal.version}</version>
             </dependency>
+            <!--elastic search-->
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${es.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>${es.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${es.version}</version>
+            </dependency>
+            <!--tools-->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>

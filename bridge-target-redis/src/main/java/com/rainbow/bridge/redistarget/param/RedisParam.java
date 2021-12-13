@@ -20,8 +20,7 @@ public class RedisParam extends Param {
 
     public RedisParam(String taskId,Integer targetId,String command,String key,String field,
                       String value,Long expireTime,Time fixedTime){
-        this.targetId = targetId;
-        this.taskId = taskId;
+        super(taskId, targetId);
         this.command = command;
         this.key = key;
         this.field = field;

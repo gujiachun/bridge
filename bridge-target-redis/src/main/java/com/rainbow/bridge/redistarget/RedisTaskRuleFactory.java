@@ -2,7 +2,7 @@ package com.rainbow.bridge.redistarget;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.rainbow.bridge.biz.entity.SyncTaskRuleRedisEntity;
+import com.rainbow.bridge.biz.entity.redis.SyncTaskRuleRedisEntity;
 import com.rainbow.bridge.core.enums.StatusEnum;
 import com.rainbow.bridge.core.utils.BeanUtil;
 import com.rainbow.bridge.targetcore.factory.taskrule.AbsTaskRuleFactory;

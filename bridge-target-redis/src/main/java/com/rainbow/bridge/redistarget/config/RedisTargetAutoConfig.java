@@ -1,7 +1,7 @@
 package com.rainbow.bridge.redistarget.config;
 
-import com.rainbow.bridge.biz.service.RedisTargetService;
-import com.rainbow.bridge.biz.service.TaskRedisRuleService;
+import com.rainbow.bridge.biz.service.redis.RedisTargetService;
+import com.rainbow.bridge.biz.service.redis.TaskRedisRuleService;
 import com.rainbow.bridge.core.constant.TargetType;
 import com.rainbow.bridge.redistarget.RedisTargetFactory;
 import com.rainbow.bridge.redistarget.RedisTaskRuleFactory;
