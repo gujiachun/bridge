@@ -412,7 +412,19 @@ redis.cluster.min-idle= 1
 
 ## ES目标源
 
-马上就来了
+![image-20211218132415900](https://p6.toutiaoimg.com/origin/tos-cn-i-qvj2lq49k0/a7da2a1c30f7431695e288b7da076871?from=pc)
+
+**类型**：指定为es
+
+**服务器地址**：链接es服务器的地址
+
+**链接配置**：代表链接es的配置，配置格式（k1=v1;k2=v2）;没有用户名和密码时，可不需要配置username=elastic;password=elastic;案例如下：
+
+```
+connectTimeOut=3000;socketTimeOut=3000;connectionRequestTimeOut=3000;maxConnectCount=100;maxConnectPerRoute=10;keepAliveMinutes=10
+```
+
+**es版本**：链接es服务器的es版本，目的只是说明而已，可以不填写
 
 ## 任务管理
 
@@ -456,7 +468,7 @@ redis.cluster.min-idle= 1
 
 规则的作用，就是让业务自行配置，如何同步数据
 
-### Mysql目标源规则
+### Mysql目标源任务规则
 
 ![mysql规则](https://p26.toutiaoimg.com/origin/pgc-image/06813e7c2b2b405b8c34bf89ee2d36a3?from=pc)
 
@@ -586,7 +598,9 @@ topic配置的源表，有可能有多个表
 
 **只更新对应的值为空**，即根据源与目标关联列过滤，更新相关同步列
 
-### redis执行规则
+------
+
+### Redis目标源任务规则
 
 ![redis执行规则](https://p26.toutiaoimg.com/origin/pgc-image/260227613181461cb7d6f0d40c38f0d1?from=pc)
 
@@ -643,6 +657,52 @@ value的模板,支持freemarker解析引擎，利用源表中的数据，对模�
 **删除事件**
 
 是否开启 源表发生【删除数据事件】的处理同步；即源表delete操作后，要不要同步。
+
+------
+
+### Es目标源任务规则(elasticsearch)
+
+![image-20211218133349590](https://p6.toutiaoimg.com/origin/tos-cn-i-qvj2lq49k0/84b1d74efc6647eeb92bc63848f4a939?from=pc)
+
+配置同步到ES的规则
+
+![es新增规则](https://p6.toutiaoimg.com/origin/tos-cn-i-qvj2lq49k0/99b064dcc8a54082808383c4cd5c6775?from=pc)
+
+父子文档如下
+
+![es父子文档](https://p6.toutiaoimg.com/origin/tos-cn-i-qvj2lq49k0/8644bade0f7b4b77aea79dd14b1d378b?from=pc)
+
+**索引格式：**数据同步哪一个index索引中，支持freemarker
+
+**id格式：**index文档的唯一id，支持freemarker
+
+**同步模式：** 0：索引更新sql模式(执行sql语句，获得es属性))，1：索引更新canal模式（直接从binlog属性中获取）
+
+   				sql模式针对负责需求，需要关联其他表时用到
+
+**字段映射：**canal模式时有效，json格式，映射es和db的属性字段，格式{k1:v1,	k2:v2} k1=v1(es属性=db列)
+
+**sql语句：**sql模式时有效，sql格式，有事件时执行sql，变量用?代替
+
+**sql字段：**sql模式时有效，sql格式中?对应的值，（以#@#隔开）
+
+**sqlNull字段：**sql模式时有效，如果sql执行结果为空是，需要清理的esFiled（逗号隔开）
+
+**字段类型：**字段的类型（k1=v1 以#@#隔开）(表示：es字段名=字段类型)\n类型有 int、date、string、array、json、decimal\n如：\nF1=array;   数组格式 array+值分隔符(1个字符)+值类型（int，decimal，string；默认不写为string）, 配合 group_concat 字符; 代表值以;隔开\nF1=json    json对象
+
+**忽略字段：**跳过忽略此字段（es属性），不需要把此es属性更新进去（F1,F2以逗号隔开）
+
+**文档类型：**0:普通文档，1：父文档，2：子文档
+
+**父子关联名：**父子文档时有效，父子关联健名（父子文档有效），如：join_field
+
+**文档关联名：**父子文档时有效，文档关联名（父子文档有效），如：父:question，子：answer
+
+**子文档路由：**子文档的route格式（父子文档有效）支持freemarker
+
+**子文档的父Id：**子文档的parent格式（父子文档有效）支持freemarker
+
+**删除策略：**0:根据index和id模板删除索引，1：sql模式有效，执行sql模板，更新索引
 
 ------
 
