@@ -69,10 +69,10 @@ bridge:
 spring:
   profiles: test
 db:
-  host: 192.168.58.123:13306
-  database: bridgetest
-  username: bridgetest
-  password: vu_6WDNP
+  host: 127.0.0.1:3306
+  database: rainbow_bridge
+  password: root
+  username: root
 
 #这个是server业务用到的配置，不同的环境可以配置不同的命名空间和线程池大小
 bridge:
