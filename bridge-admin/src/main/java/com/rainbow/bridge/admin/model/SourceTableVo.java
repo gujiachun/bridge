@@ -6,21 +6,13 @@ import lombok.Data;
  * @author gujiachun
  */
 @Data
-public class TopicVo {
+public class SourceTableVo {
 
     private Integer id;
 
-    private String topic;
-
-    private String env;
-
     private Integer sourceId;
 
-    private Integer mqId;
+    private String tableName;
 
     private String remark;
-
-    private String syncDb;
-
-    private String syncTable;
 }

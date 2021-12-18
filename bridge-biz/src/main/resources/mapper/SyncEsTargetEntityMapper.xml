@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainbow.bridge.biz.mapper.es.SyncEsTargetMapper">
+
+    <select id="queryEsTarget"
+            resultType="com.rainbow.bridge.biz.dto.EsTargetDto">
+        SELECT
+        sync_es_target.id AS id,
+        sync_es_target.hosts AS hosts,
+        sync_es_target.props AS props,
+        sync_es_target.version AS version,
+        sync_es_target.target_id AS targetId,
+        sync_es_target.created_time AS createdTime,
+        sync_es_target.updated_time AS updatedTime,
+        sync_target.name AS name,
+        sync_target.remark AS remark,
+        sync_target.env AS env,
+        sync_target.type AS type
+        FROM sync_es_target inner join sync_target on sync_es_target.target_id = sync_target.id
+        WHERE 1 = 1
+        <if test="model.env != null and model.env !=''">
+            AND #{model.env} = sync_target.env
+        </if>
+        <if test="model.name != null and model.name !=''">
+            AND sync_target.name like concat('%',#{model.name},'%')
+        </if>
+        ORDER BY sync_es_target.created_time asc
+    </select>
+
+</mapper>

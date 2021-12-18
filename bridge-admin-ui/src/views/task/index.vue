@@ -423,6 +423,9 @@ export default {
       }else if(row.targetType == 'redis'){
         console.info('taskId=' + row.id)
         this.$router.push('/task/rule/redis?taskId=' + row.id)
+      }else if(row.targetType == 'es'){
+        console.info('taskId=' + row.id)
+        this.$router.push('/task/rule/es?taskId=' + row.id)
       }
     },
     handleShowActive(row){

@@ -7,6 +7,16 @@ export function getMqList() {
   })
 }
 
+export function getMqListByEnv(env) {
+  return request({
+    url: '/mq/query/env',
+    method: 'get',
+    params: {
+      env: env
+    }
+  })
+}
+
 export function addMq(data) {
   return request({
     url: '/mq',

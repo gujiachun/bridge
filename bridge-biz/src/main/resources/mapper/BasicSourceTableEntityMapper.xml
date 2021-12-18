@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainbow.bridge.biz.mapper.BasicSourceTableMapper">
+    <select id="querySourceTable"
+            resultType="com.rainbow.bridge.biz.dto.SourceTableDto">
+        SELECT
+        basic_source_table.id AS id,
+        basic_source_table.source_id AS sourceId,
+        basic_source_table.table_name AS tableName,
+        basic_source_table.remark AS remark,
+        basic_source.source_name AS sourceName,
+        basic_source.db_name AS dbName,
+        basic_source.env AS env
+        FROM basic_source_table
+        inner join basic_source on basic_source_table.source_id = basic_source.id
+        WHERE 1 = 1
+        <if test="model.tableName != null and model.tableName !=''">
+            AND basic_source_table.table_name like concat('%',#{model.tableName},'%')
+        </if>
+        <if test="model.sourceId != null">
+            AND basic_source_table.source_id = #{model.sourceId}
+        </if>
+        ORDER BY basic_source_table.id asc
+    </select>
+</mapper>

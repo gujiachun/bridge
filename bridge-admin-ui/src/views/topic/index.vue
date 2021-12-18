@@ -95,9 +95,22 @@
         <el-form-item label="topic" prop="topic">
           <el-input v-model="nodeModel.topic" />
         </el-form-item>
+        <el-form-item label="所属命名空间" prop="env">
+          <el-select v-if="dialogStatus === 'create'" v-model="nodeModel.env" v-on:change="envSelect($event)" placeholder="选择所属命名空间">
+            <el-option v-for="item in nameSpaces" :key="item.id" :label="item.name" :value="item.env" />
+          </el-select>
+          <el-select v-else v-model="nodeModel.env" placeholder="选择所属命名空间" disabled="disabled">
+            <el-option v-for="item in nameSpaces" :key="item.id" :label="item.name" :value="item.env" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="归属MQ" prop="mqId">
           <el-select v-model="nodeModel.mqId" placeholder="选择mq">
             <el-option v-for="item in mqList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="对应源名" prop="sourceId">
+          <el-select v-model="nodeModel.sourceId" placeholder="选择对应源名" v-on:change="sourceSelect($event)">
+            <el-option v-for="item in sourceList" :key="item.id" :label="item.sourceName" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="触发的库" prop="syncDb">
@@ -110,7 +123,7 @@
               </span>
             </el-popover>
           </template>
-          <el-input v-model="nodeModel.syncDb" />
+          <el-input v-model="nodeModel.syncDb" disabled />
         </el-form-item>
         <el-form-item label="触发的表" prop="syncTable">
           <template slot="label">
@@ -122,14 +135,9 @@
               </span>
             </el-popover>
           </template>
-          <el-input v-model="nodeModel.syncTable" type="textarea"/>
-        </el-form-item>
-        <el-form-item label="所属命名空间" prop="env">
-          <el-select v-if="dialogStatus === 'create'" v-model="nodeModel.env" placeholder="选择所属命名空间">
-            <el-option v-for="item in nameSpaces" :key="item.id" :label="item.name" :value="item.env" />
-          </el-select>
-          <el-select v-else v-model="nodeModel.env" placeholder="选择所属命名空间" disabled="disabled">
-            <el-option v-for="item in nameSpaces" :key="item.id" :label="item.name" :value="item.env" />
+          <!-- <el-input v-model="nodeModel.syncTable" type="textarea"/> -->
+          <el-select v-model="nodeModel.syncTableList" placeholder="选择对应表" multiple>
+            <el-option v-for="item in sourceTableList" :key="item.tableName" :label="item.tableName" :value="item.tableName" />
           </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
@@ -148,7 +156,9 @@
 <script>
 import { getTopicList, addTopic, updateTopic, deleteTopic } from '@/api/topic'
 import { getNameSpaceList } from '@/api/namespace'
-import { getMqList } from '@/api/mq'
+import { getSourceListByEnv,getSource } from '@/api/source'
+import { getSourceTableListBySourceId } from '@/api/sourceTable'
+import { getMqList,getMqListByEnv } from '@/api/mq'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -171,12 +181,16 @@ export default {
       dialogStatus: 'create',
       nameSpaces: [],
       mqList: [],
+      sourceList: [],
+      sourceTableList: [],
       nodeModel: {
         id: undefined,
         topic: null,
         env: null,
         syncDb: null,
         syncTable: null,
+        syncTableList: null,
+        sourceId: null,
         mqId: null,
         remark: null
       },
@@ -190,7 +204,7 @@ export default {
       rules: {
         topic: [{ required: true, message: 'topic不能为空', trigger: 'change' }],
         syncDb: [{ required: true, message: '触发数据库不能为空', trigger: 'change' }],
-        syncTable: [{ required: true, message: '触发的表不能为空', trigger: 'change' }],
+        sourceId: [{ required: true, message: '请选择源名，源名不能为空', trigger: 'change' }],
         mqId: [{ required: true, message: 'mq不能为空', trigger: 'change' }],
         env: [{ required: true, message: '命名空间不能为空', trigger: 'change' }]
       },
@@ -204,9 +218,9 @@ export default {
     getNameSpaceList().then((res) => {
       this.nameSpaces = res.data
     })
-    getMqList().then((res) => {
-      this.mqList = res.data
-    })
+    // getMqList().then((res) => {
+    //   this.mqList = res.data
+    // })
     this.fetchData()
   },
   methods: {
@@ -216,6 +230,33 @@ export default {
         this.list = response.data.records
         this.count = response.data.total
         this.listLoading = false
+      })
+    },
+    envSelect(event){
+      this.nodeModel.sourceId = null
+      this.nodeModel.syncDb = null
+      this.nodeModel.mqId = null
+      this.sourceList = null
+      this.mqList = null
+      this.nodeModel.syncTable = null
+      this.nodeModel.syncTableList = null
+      this.sourceTableList = null
+      var env = event;
+      getMqListByEnv(env).then((res) => {
+        this.mqList = res.data
+      })
+      getSourceListByEnv(env).then((res) => {
+        this.sourceList = res.data
+      })
+    },
+    sourceSelect(event){
+      var sourceId = event;
+      this.nodeModel.sourceId = sourceId
+      getSource(sourceId).then((res) => {
+        this.nodeModel.syncDb = res.data.dbName
+      })
+      getSourceTableListBySourceId(sourceId).then((res) => {
+        this.sourceTableList = res.data
       })
     },
     queryData() {
@@ -228,10 +269,13 @@ export default {
         topic: null,
         env: null,
         syncDb: null,
+        sourceId: null,
         syncTable: null,
+        syncTableList: null,
         mqId: null,
         remark: null
-      }
+      };
+      this.sourceTableList = null;
     },
     handleCreate() {
       this.resetModel()
@@ -244,6 +288,11 @@ export default {
     dataOperation() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+
+          if(this.nodeModel.syncTableList != null){
+            this.nodeModel.syncTable = this.nodeModel.syncTableList.join(',')
+          }
+
           if (this.dialogStatus === 'create') {
             addTopic(this.nodeModel).then(res => {
               this.operationRes(res)
@@ -274,7 +323,24 @@ export default {
     },
     handleUpdate(row) {
       this.resetModel()
-      this.nodeModel = Object.assign({}, row)
+      this.nodeModel = Object.assign(this.nodeModel, row)
+
+      var env = this.nodeModel.env
+      getMqListByEnv(env).then((res) => {
+        this.mqList = res.data
+      })
+      getSourceListByEnv(env).then((res) => {
+        this.sourceList = res.data
+      })
+
+      getSourceTableListBySourceId(this.nodeModel.sourceId).then((res) => {
+        this.sourceTableList = res.data
+      })
+
+      if(this.nodeModel.syncTable != null && this.nodeModel.syncTable != ''){
+        this.nodeModel.syncTableList = this.nodeModel.syncTable.split(',')
+      }
+
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {

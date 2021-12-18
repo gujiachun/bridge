@@ -1,10 +1,13 @@
 package com.rainbow.bridge.admin.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.rainbow.bridge.admin.model.MqVo;
 import com.rainbow.bridge.biz.entity.BasicMqEntity;
+import com.rainbow.bridge.biz.entity.BasicSourceEntity;
 import com.rainbow.bridge.biz.service.MqService;
 import com.rainbow.bridge.core.Result;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +25,16 @@ public class MqController {
     @GetMapping("/mq")
     public Result<List<BasicMqEntity>> getList(){
         return Result.success(mqService.list());
+    }
+
+    @GetMapping("/mq/query/env")
+    public Result<List<BasicMqEntity>> getListByEnv(@RequestParam("env") String env){
+        QueryWrapper queryWrapper = new QueryWrapper();
+        if (StringUtils.isNotBlank(env)){
+            queryWrapper.eq("env",env);
+        }
+
+        return Result.success(mqService.list(queryWrapper));
     }
 
     @PostMapping("/mq")

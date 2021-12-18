@@ -1,5 +1,6 @@
 package com.rainbow.bridge.admin.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -67,8 +68,15 @@ public class TopicController {
         entity.setEnv(vo.getEnv());
         entity.setMqId(vo.getMqId());
         entity.setRemark(vo.getRemark());
+        entity.setSourceId(vo.getSourceId());
         entity.setSyncDb(vo.getSyncDb());
         entity.setSyncTable(vo.getSyncTable());
+//        if (StringUtils.isNotBlank(vo.getSyncTable())){
+//            List<String> strings = JSONObject.parseArray(vo.getSyncTable(), String.class);
+//            String join = String.join(",", strings);
+//            entity.setSyncTable(join);
+//        }
+
         return Result.success(topicService.save(entity));
     }
 
@@ -79,6 +87,7 @@ public class TopicController {
         entity.setTopic(vo.getTopic());
         entity.setEnv(vo.getEnv());
         entity.setMqId(vo.getMqId());
+        entity.setSourceId(vo.getSourceId());
         entity.setRemark(vo.getRemark());
         entity.setSyncDb(vo.getSyncDb());
         entity.setSyncTable(vo.getSyncTable());

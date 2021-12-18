@@ -88,6 +88,19 @@ export const constantRoutes = [
         meta: { title: 'MQ管理', icon: 'el-icon-money' }
       },
       {
+        path: 'source',
+        name: 'source',
+        component: () => import('@/views/source/index'),
+        meta: { title: 'Source源', icon: 'el-icon-collection-tag' }
+      },
+      {
+        path: 'source/table',
+        name: 'source源表',
+        component: () => import('@/views/source/sourceTable'),
+        meta: { title: 'source源表' },
+        hidden: true
+      },
+      {
         path: 'topic',
         name: 'topic',
         component: () => import('@/views/topic/index'),
@@ -149,6 +162,13 @@ export const constantRoutes = [
         name: 'redis任务规则',
         component: () => import('@/views/task/redisRule'),
         meta: { title: 'redis任务规则' },
+        hidden: true
+      },
+      {
+        path: 'rule/es',
+        name: 'es任务规则',
+        component: () => import('@/views/task/esRule'),
+        meta: { title: 'es任务规则' },
         hidden: true
       }
     ]
