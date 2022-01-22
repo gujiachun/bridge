@@ -10,6 +10,7 @@ import com.rainbow.bridge.biz.entity.BasicSourceTableEntity;
 import com.rainbow.bridge.biz.mapper.BasicSourceTableMapper;
 import com.rainbow.bridge.biz.service.SourceTableService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author gujiachun

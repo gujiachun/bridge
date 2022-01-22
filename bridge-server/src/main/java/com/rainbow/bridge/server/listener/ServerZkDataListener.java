@@ -1,30 +1,32 @@
 package com.rainbow.bridge.server.listener;
 
 import com.rainbow.bridge.server.handler.TaskHandler;
-import org.I0Itec.zkclient.IZkDataListener;
+import com.rainbow.bridge.server.utils.SpringUtil;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author gujiachun
  */
-public class ServerZkDataListener implements IZkDataListener {
+public class ServerZkDataListener implements NodeCacheListener {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerZkDataListener.class);
 
-    @Autowired
-    private TaskHandler taskHandler;
+    private String path;
 
-    @Override
-    public void handleDataChange(String dataPath, Object data) throws Exception {
-        logger.info("节点数据变化 dataPath:{},data:{}",dataPath,data);
-        taskHandler.refresh();
+    public ServerZkDataListener(String path){
+        this.path = path;
     }
 
     @Override
-    public void handleDataDeleted(String dataPath) throws Exception {
-        logger.info("节点数据删除 dataPath:{}",dataPath);
+    public void nodeChanged() throws Exception {
+        logger.info("节点数据变化 dataPath:{}",path);
+        TaskHandler taskHandler = SpringUtil.getBean(TaskHandler.class);
+        if (taskHandler == null){
+            logger.warn("taskHandler is null");
+            return;
+        }
         taskHandler.refresh();
     }
 }

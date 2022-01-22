@@ -1,27 +1,26 @@
 package com.rainbow.bridge.admin.client;
 
-import com.rainbow.bridge.core.zk.ZkClientExt;
-import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.serialize.ZkSerializer;
+import com.rainbow.bridge.core.zk.ZkClientImpl;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.CloseableUtils;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author gujiachun
  */
-public class ZkBridgeClient extends ZkClient {
+public class ZkBridgeClient extends ZkClientImpl {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZkBridgeClient.class);
-
-    public ZkBridgeClient(String zkServers, int sessionTimeout, int connectionTimeout, ZkSerializer zkSerializer,
-                       String rootPath,String env) {
-        super(zkServers, sessionTimeout, connectionTimeout, zkSerializer);
+    public ZkBridgeClient(String zkServers, int sessionTimeout, String rootPath,String env) {
+        super(zkServers, sessionTimeout);
         this.rootPath = rootPath;
         this.env = env;
-    }
-
-    public ZkBridgeClient(String zkServers, int sessionTimeout, int connectionTimeout, ZkSerializer zkSerializer){
-        super(zkServers, sessionTimeout, connectionTimeout, zkSerializer);
     }
 
     private String rootPath;

@@ -13,7 +13,6 @@ import com.rainbow.bridge.biz.service.TaskService;
 import com.rainbow.bridge.biz.service.ZkService;
 import com.rainbow.bridge.core.enums.StatusEnum;
 import com.rainbow.bridge.core.model.TaskDto;
-import com.rainbow.bridge.core.zk.BridgeZkSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -53,8 +52,7 @@ public class ServerRunner implements ApplicationRunner {
     private void initZkClient(){
         List<BasicZkEntity> list = zkService.list();
         for (BasicZkEntity entity : list){
-            ZkBridgeClient client = new ZkBridgeClient(entity.getServers(), 5000,3000,
-                    new BridgeZkSerializer(),entity.getRootPath(),entity.getEnv());
+            ZkBridgeClient client = new ZkBridgeClient(entity.getServers(), 5000,entity.getRootPath(),entity.getEnv());
             zkBridgeClientFactory.addZkBridgeClient(entity.getEnv(),client);
         }
     }
@@ -64,7 +62,7 @@ public class ServerRunner implements ApplicationRunner {
         for (String key : zkBridgeClientMap.keySet()){
             ZkBridgeClient client = zkBridgeClientMap.get(key);
             if (!client.exists(client.getRootPath())) {
-                client.createPersistent(client.getRootPath(), true);
+                client.createPersistent(client.getRootPath());
             }
         }
     }

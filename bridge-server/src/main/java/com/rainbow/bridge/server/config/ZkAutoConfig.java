@@ -7,11 +7,11 @@ import com.rainbow.bridge.biz.service.ClusterService;
 import com.rainbow.bridge.biz.service.ZkService;
 import com.rainbow.bridge.core.ResultEnum;
 import com.rainbow.bridge.core.exception.BusinessException;
-import com.rainbow.bridge.core.zk.BridgeZkSerializer;
-import com.rainbow.bridge.core.zk.ZkClientExt;
 import com.rainbow.bridge.server.listener.ServerZkChildListener;
 import com.rainbow.bridge.server.listener.ServerZkDataListener;
+import com.rainbow.bridge.server.zk.ZkClientExt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.framework.recipes.cache.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +40,7 @@ public class ZkAutoConfig {
     public ClusterService clusterService;
 
     @Bean
-    public ServerZkChildListener serverZkChildListener(){
-        return new ServerZkChildListener();
-    }
-
-    @Bean
-    public ServerZkDataListener serverZkDataListener(){
-        return new ServerZkDataListener();
-    }
-
-    @Bean
-    public ZkClientExt zkClientExt(ZkService zkService,ServerZkDataListener serverZkDataListener,ServerZkChildListener serverZkChildListener){
+    public ZkClientExt zkClientExt(ZkService zkService) throws Exception {
 
         QueryWrapper<BasicZkEntity> wrapper = new QueryWrapper();
         wrapper.eq("env",env);
@@ -63,10 +53,9 @@ public class ZkAutoConfig {
 
         ZkClientExt zkc;
         if (StringUtils.isNotBlank(clusterCode)){
-            zkc = new ZkClientExt(one.getServers(), 5000,3000,
-                    new BridgeZkSerializer(),one.getRootPath(),clusterCode);
+            zkc = new ZkClientExt(one.getServers(), 5000,one.getRootPath(),clusterCode);
         }else{
-            zkc = new ZkClientExt(one.getServers(), 5000,3000,new BridgeZkSerializer());
+            zkc = new ZkClientExt(one.getServers(), 5000);
             List<BasicClusterEntity> listByEnv = clusterService.getListByEnv(env);
             if (listByEnv == null || listByEnv.size() == 0){
                 logger.error("环境:{}没有对应的集群配置,请到控制台中的集群管理菜单去配置",env);
@@ -87,7 +76,7 @@ public class ZkAutoConfig {
                     for (String taskPath : children){
                         //任务节点的值 格式[ip:port,datetime] 如172.16.112.1:8064,2021-10-22 21:50:57
                         //ip+port代表着实例
-                        Object o = zkc.readData(one.getRootPath() + "/" + code + "/" + taskPath, true);
+                        Object o = zkc.readData(one.getRootPath() + "/" + code + "/" + taskPath);
                         if (o != null){
                             String v = o.toString();
                             String[] split = v.split(",");
@@ -112,8 +101,17 @@ public class ZkAutoConfig {
             zkc.setRootPathCluster(one.getRootPath(),clusterCode);
         }
 
-        zkc.subscribeChildChanges(one.getRootPath() + "/" + clusterCode,serverZkChildListener);
-        zkc.subscribeDataChanges(one.getRootPath()+ "/" + clusterCode,serverZkDataListener);
+        String path = one.getRootPath() + "/" + clusterCode;
+        PathChildrenCache childrenCache = new PathChildrenCache(zkc.getClient(), path, true);
+        PathChildrenCacheListener childrenCacheListener = new ServerZkChildListener(path);
+        childrenCache.getListenable().addListener(childrenCacheListener);
+        childrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
+        logger.info("监听节点:{}下的子节点成功",one.getRootPath() + "/" + clusterCode);
+
+        final NodeCache nodeCache = new NodeCache(zkc.getClient(), path, false);
+        nodeCache.getListenable().addListener(new ServerZkDataListener(path));
+
+        nodeCache.start(true);
 
         return zkc;
     }

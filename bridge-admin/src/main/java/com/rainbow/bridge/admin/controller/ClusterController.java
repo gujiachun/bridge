@@ -51,7 +51,7 @@ public class ClusterController {
                 for (String taskPath : children){
                     //任务节点的值 格式[ip:port,datetime] 如172.16.112.1:8064,2021-10-22 21:50:57
                     //ip+port代表着实例
-                    Object o = zkBridgeClient.readData(zkBridgeClient.getRootPath() + "/" + basicClusterDto.getCode() + "/" + taskPath, true);
+                    Object o = zkBridgeClient.readData(zkBridgeClient.getRootPath() + "/" + basicClusterDto.getCode() + "/" + taskPath);
                     if (o != null){
                         String v = o.toString();
                         String[] split = v.split(",");

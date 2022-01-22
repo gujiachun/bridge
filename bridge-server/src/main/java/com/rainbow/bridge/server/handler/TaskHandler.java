@@ -7,16 +7,18 @@ import com.rainbow.bridge.canal.CanalClient;
 import com.rainbow.bridge.core.model.TaskDto;
 import com.rainbow.bridge.core.utils.IpLocalUtil;
 import com.rainbow.bridge.core.utils.MysqlJavaTypeMapping;
-import com.rainbow.bridge.core.zk.SimpleDistributedLockImpl;
-import com.rainbow.bridge.core.zk.ZkClientExt;
 import com.rainbow.bridge.server.factory.CanalClientFactory;
+import com.rainbow.bridge.server.zk.ZkClientExt;
 import com.rainbow.bridge.targetcore.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.targetcore.factory.taskrule.TaskRuleFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.framework.recipes.locks.InterProcessLock;
+import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -85,7 +87,7 @@ public class TaskHandler {
      *@return void
     */
     private void checkTodoTasks(List<TaskDto> addTaskList,List<TaskDto> delTaskList,List<TaskDto> updateTaskList){
-        String tasks = zkClientExt.readData(zkClientExt.getClusterPath(), true);
+        String tasks = zkClientExt.readData(zkClientExt.getClusterPath());
 
         if (StringUtils.isBlank(tasks)){
             return;
@@ -148,7 +150,7 @@ public class TaskHandler {
             //不存在 集群任务中，需要剔除
             if (!contineAcitonTaskId){
                 logger.info(">>>>>读取临时任务节点的数据:{}",zkClientExt.getClusterPath() + "/" + taskIdPath);
-                Object o = zkClientExt.readData(zkClientExt.getClusterPath() + "/" + taskIdPath, true);
+                Object o = zkClientExt.readData(zkClientExt.getClusterPath() + "/" + taskIdPath);
                 if ( o != null){
                     String data = o.toString();
                     logger.info(">>>>>读取临时任务节点:{},数据:{}",zkClientExt.getClusterPath() + "/" + taskIdPath,data);
@@ -198,7 +200,7 @@ public class TaskHandler {
         logger.info("自动refresh了哦........");
 
         String lockName = zkClientExt.getRootPath() + "/" + zkClientExt.getClusterName() + "-task-locker";
-        SimpleDistributedLockImpl lock = new SimpleDistributedLockImpl(zkClientExt, lockName);
+        InterProcessLock lock = new InterProcessSemaphoreMutex(zkClientExt.getClient(), lockName );
 
         try{
             logger.info(">>>>>>>>去申请加锁:{}",lockName);
@@ -226,7 +228,7 @@ public class TaskHandler {
         }catch (Exception e){
             logger.error("领取任务 异常:{}",e.getMessage());
         }finally {
-            logger.info("释放锁>>>>>>>>:{}",lock.getLockerNodePath());
+            logger.info("释放锁>>>>>>>>:{}",lockName);
             lock.release();
             canalClientFactory.start();
         }
@@ -279,7 +281,7 @@ public class TaskHandler {
                 taskCanalClientMap.remove(taskDto.getTaskId());
                 //移除临时节点
                 logger.info(">>>>移除临时节点:{}",zkEsTaskMap.get(taskDto.getTaskId()));
-                zkClientExt.delete(zkEsTaskMap.get(taskDto.getTaskId()));
+                zkClientExt.deletePath(zkEsTaskMap.get(taskDto.getTaskId()));
                 //移除任务和节点关联
                 zkEsTaskMap.remove(taskDto.getTaskId());
 
@@ -405,7 +407,10 @@ public class TaskHandler {
 
             //处理成功后 增加临时有序节点
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formatDate = simpleDateFormat.format(taskDto.getUpdateTaskRuleTime());
+            String formatDate = "";
+            if (taskDto.getUpdateTaskRuleTime() != null){
+                formatDate = simpleDateFormat.format(taskDto.getUpdateTaskRuleTime());
+            }
             String content = String.format("%s,%s,%s,%s,%s",IpLocalUtil.getLocalIpByNetcard() + ":" + port,
                     formatDate,taskDto.getTaskId(),taskDto.getTargetType(),taskDto.getInstCount());
             //任务临时节点 和 任务id的关联关系
@@ -475,7 +480,7 @@ public class TaskHandler {
             //此任务判断
             if (taskId.equals(taskDto.getTaskId())){
                 logger.info(">>>>>>taskId:{},taskPath:{}",taskId,zkEsTaskMap.get(taskId));
-                String value = zkClientExt.readData(zkEsTaskMap.get(taskId),true);
+                String value = zkClientExt.readData(zkEsTaskMap.get(taskId));
                 if (value != null){
                     String[] split = value.split(",");
                     try{

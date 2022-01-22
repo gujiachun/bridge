@@ -145,7 +145,7 @@ public class TaskController {
                 //任务节点的值 格式[ip:port,datetime] 如172.16.112.1:8064,2021-10-22 21:50:57
                 //ip+port代表着实例
                 if (taskPath.indexOf(taskId)>=0){
-                    Object o = zkBridgeClient.readData(zkBridgeClient.getRootPath() + "/" + clusterCode+ "/" + taskPath, true);
+                    Object o = zkBridgeClient.readData(zkBridgeClient.getRootPath() + "/" + clusterCode+ "/" + taskPath);
                     if (o != null){
                         ipPortList.add(o.toString());
                     }
