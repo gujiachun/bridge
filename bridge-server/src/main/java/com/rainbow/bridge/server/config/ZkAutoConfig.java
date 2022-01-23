@@ -8,6 +8,7 @@ import com.rainbow.bridge.biz.service.ZkService;
 import com.rainbow.bridge.core.ResultEnum;
 import com.rainbow.bridge.core.exception.BusinessException;
 import com.rainbow.bridge.server.listener.ServerZkChildListener;
+import com.rainbow.bridge.server.listener.ServerZkConnectionStateListener;
 import com.rainbow.bridge.server.listener.ServerZkDataListener;
 import com.rainbow.bridge.server.zk.ZkClientExt;
 import org.apache.commons.lang3.StringUtils;
@@ -112,6 +113,8 @@ public class ZkAutoConfig {
         nodeCache.getListenable().addListener(new ServerZkDataListener(path));
 
         nodeCache.start(true);
+
+        zkc.getClient().getConnectionStateListenable().addListener(new ServerZkConnectionStateListener());
 
         return zkc;
     }

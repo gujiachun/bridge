@@ -345,12 +345,24 @@ public class TaskHandler {
 
         if (taskCanalClientMap != null && taskCanalClientMap.size() > 0) {
             logger.info("集群任务发生变化了，去认领任务了哦-----过滤重复任务");
+
+            //获取集群节点 下 所有的任务实例
+            List<String> taskPathChildren = zkClientExt.getChildren(zkClientExt.getClusterPath());
+
             //过滤掉 已经处理的任务taskId
             Iterator<TaskDto> iterator = addTaskList.iterator();
             while (iterator.hasNext()) {
                 TaskDto taskDto = iterator.next();
                 if (taskCanalClientMap.containsKey(taskDto.getTaskId())) {
+                    logger.info("过滤重复任务，已经执行了任务：{} 无需再次执行",taskDto.getTaskId());
                     iterator.remove();
+                    // 检查此 正在执行的任务，有没有临时节点，如 没有,需要补进去
+                    // 原因很有可能zookeeper 中断重启了
+                    if (!checkExistsTaskHasZkTempPath(taskDto,taskPathChildren)){
+                        logger.info("补偿 新增临时节点,任务:{}",taskDto.getTaskId());
+                        String zkTempPath = addTempZkPath(taskDto);
+                        zkEsTaskMap.put(taskDto.getTaskId(), zkTempPath);
+                    }
                 }
             }
         }
@@ -360,7 +372,7 @@ public class TaskHandler {
         }
 
         int actionCount = maxTaskCount - taskCanalClientMap.size();
-        logger.info("集群任务发生变化了，去认领任务了哦-----过滤后---新增任务");
+        logger.info("集群任务发生变化了，去认领任务了哦-----过滤后---新增任务数量:{}",actionCount);
         //有很多任务没有处理，就随机取
         if (addTaskList.size() > actionCount){
             //随机置换
@@ -370,6 +382,52 @@ public class TaskHandler {
             buildExecutor(addTaskList);
         }
     }
+
+    /**
+     * 判断已经处理的任务，有没有临时节点存在
+     * 这个场景 会出现在zookeeper中断后，恢复时，临时节点 丢失
+     * */
+    private boolean checkExistsTaskHasZkTempPath(TaskDto taskDto,List<String> taskTempPathChildren){
+
+        String currentIpPort = IpLocalUtil.getLocalIpByNetcard() + ":" + port;
+
+        for (String taskIdTempPath : taskTempPathChildren){
+            String data = zkClientExt.readData(zkClientExt.getClusterPath() + "/" + taskIdTempPath);
+            if ( StringUtils.isNotBlank(data)){
+                logger.info(">>>>>读取临时任务节点:{},数据:{}",zkClientExt.getClusterPath() + "/" + taskIdTempPath,data);
+                String[] split = data.split(",");
+                logger.info(">>>>>读取临时任务节点:{},数据:{},split:{}",zkClientExt.getClusterPath() + "/" + taskIdTempPath,data,split.length);
+                String taskId = split[2];
+                String ipPort = split[0];
+
+                if (currentIpPort.equals(ipPort) && taskDto.getTaskId().equals(taskId)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 添加 任务的 临时节点
+     * */
+    private String addTempZkPath(TaskDto taskDto){
+        //处理成功后 增加临时有序节点
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formatDate = "";
+        if (taskDto.getUpdateTaskRuleTime() != null){
+            formatDate = simpleDateFormat.format(taskDto.getUpdateTaskRuleTime());
+        }
+        String content = String.format("%s,%s,%s,%s,%s",IpLocalUtil.getLocalIpByNetcard() + ":" + port,
+                formatDate,taskDto.getTaskId(),taskDto.getTargetType(),taskDto.getInstCount());
+        //任务临时节点 和 任务id的关联关系
+        String esTaskPath = zkClientExt.createEphemeralSequential(zkClientExt.getClusterPath() + "/" + taskDto.getTaskId(),content);
+        logger.info(">>>>>taskId:{}产生了临时节点:{}",taskDto.getTaskId(),esTaskPath);
+        return esTaskPath;
+    }
+
+
+
 
     /**
      * 构建执行任务
@@ -406,16 +464,7 @@ public class TaskHandler {
             }
 
             //处理成功后 增加临时有序节点
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formatDate = "";
-            if (taskDto.getUpdateTaskRuleTime() != null){
-                formatDate = simpleDateFormat.format(taskDto.getUpdateTaskRuleTime());
-            }
-            String content = String.format("%s,%s,%s,%s,%s",IpLocalUtil.getLocalIpByNetcard() + ":" + port,
-                    formatDate,taskDto.getTaskId(),taskDto.getTargetType(),taskDto.getInstCount());
-            //任务临时节点 和 任务id的关联关系
-            String esTaskPath = zkClientExt.createEphemeralSequential(zkClientExt.getClusterPath() + "/" + taskDto.getTaskId(),content);
-            logger.info(">>>>>taskId:{}产生了临时节点:{}",taskDto.getTaskId(),esTaskPath);
+            String esTaskPath = addTempZkPath(taskDto);
             zkEsTaskMap.put(taskDto.getTaskId(),esTaskPath);
         }
 
