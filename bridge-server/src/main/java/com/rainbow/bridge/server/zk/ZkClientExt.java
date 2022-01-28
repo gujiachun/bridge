@@ -11,14 +11,14 @@ public class ZkClientExt extends ZkClientImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(ZkClientExt.class);
 
-    public ZkClientExt(String zkServers, int sessionTimeout,
+    public ZkClientExt(String zkServers,
                        String rootPath,String clusterName) {
-        super(zkServers, sessionTimeout);
+        super(zkServers);
         setRootPathCluster(rootPath,clusterName);
     }
 
-    public ZkClientExt(String zkServers, int sessionTimeout) {
-        super(zkServers, sessionTimeout);
+    public ZkClientExt(String zkServers) {
+        super(zkServers);
     }
 
     private String rootPath;

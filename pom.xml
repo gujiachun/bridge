@@ -7,7 +7,7 @@
     <groupId>com.rainbow.bridge</groupId>
     <artifactId>bridge</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.1</version>
+    <version>1.2.1.1</version>
     <modules>
         <module>bridge-core</module>
         <module>bridge-web-starter</module>

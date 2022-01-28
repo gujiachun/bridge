@@ -1,5 +1,5 @@
 server:
-  port: 8067
+  port: 12156
 
 spring:
   profiles:
@@ -46,6 +46,10 @@ mybatis-plus:
 spring:
   profiles: dev
 db:
+#  host: 192.168.58.79:13306
+#  database: bridgedev
+#  username: bridgedev
+#  password: D1_ucXgN
   host: 127.0.0.1:3306
   database: rainbow_bridge
   username: root

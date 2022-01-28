@@ -25,11 +25,10 @@ public class ZkClientImpl implements ZkClient {
     /** zkclient 重试次数 */
     private int retryCount = 5;
 
-    public ZkClientImpl(String zkServers, int sessionTimeout){
+    public ZkClientImpl(String zkServers){
         client = CuratorFrameworkFactory
                 .builder()
                 .connectString(zkServers)
-                .sessionTimeoutMs(sessionTimeout)
                 .retryPolicy(new ExponentialBackoffRetry(baseSleepTimeMs, retryCount))
                 .build();
         client.start();

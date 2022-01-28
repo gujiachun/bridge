@@ -52,7 +52,7 @@ public class ServerRunner implements ApplicationRunner {
     private void initZkClient(){
         List<BasicZkEntity> list = zkService.list();
         for (BasicZkEntity entity : list){
-            ZkBridgeClient client = new ZkBridgeClient(entity.getServers(), 5000,entity.getRootPath(),entity.getEnv());
+            ZkBridgeClient client = new ZkBridgeClient(entity.getServers(),entity.getRootPath(),entity.getEnv());
             zkBridgeClientFactory.addZkBridgeClient(entity.getEnv(),client);
         }
     }

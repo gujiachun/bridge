@@ -13,6 +13,8 @@ import com.rainbow.bridge.targetcore.factory.targetsource.TargetFactory;
 import com.rainbow.bridge.targetcore.factory.taskrule.TaskRuleFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.recipes.locks.InterProcessLock;
+import org.apache.curator.framework.recipes.locks.InterProcessMultiLock;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,7 +202,12 @@ public class TaskHandler {
         logger.info("自动refresh了哦........");
 
         String lockName = zkClientExt.getRootPath() + "/" + zkClientExt.getClusterName() + "-task-locker";
-        InterProcessLock lock = new InterProcessSemaphoreMutex(zkClientExt.getClient(), lockName );
+        String s = zkClientExt.readData(zkClientExt.getRootPath() + "/" + zkClientExt.getClusterName());
+        logger.info("c:{}",s);
+//        if (!zkClientExt.exists(lockName)){
+//            zkClientExt.createPersistent(lockName);
+//        }
+        InterProcessLock lock = new InterProcessMutex(zkClientExt.getClient(), lockName );
 
         try{
             logger.info(">>>>>>>>去申请加锁:{}",lockName);

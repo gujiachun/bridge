@@ -54,9 +54,9 @@ public class ZkAutoConfig {
 
         ZkClientExt zkc;
         if (StringUtils.isNotBlank(clusterCode)){
-            zkc = new ZkClientExt(one.getServers(), 5000,one.getRootPath(),clusterCode);
+            zkc = new ZkClientExt(one.getServers(),one.getRootPath(),clusterCode);
         }else{
-            zkc = new ZkClientExt(one.getServers(), 5000);
+            zkc = new ZkClientExt(one.getServers());
             List<BasicClusterEntity> listByEnv = clusterService.getListByEnv(env);
             if (listByEnv == null || listByEnv.size() == 0){
                 logger.error("环境:{}没有对应的集群配置,请到控制台中的集群管理菜单去配置",env);

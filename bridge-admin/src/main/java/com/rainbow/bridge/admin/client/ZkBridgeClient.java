@@ -17,8 +17,8 @@ import java.util.List;
  */
 public class ZkBridgeClient extends ZkClientImpl {
 
-    public ZkBridgeClient(String zkServers, int sessionTimeout, String rootPath,String env) {
-        super(zkServers, sessionTimeout);
+    public ZkBridgeClient(String zkServers, String rootPath,String env) {
+        super(zkServers);
         this.rootPath = rootPath;
         this.env = env;
     }
