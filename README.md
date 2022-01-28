@@ -276,6 +276,63 @@ V1.0版本时没有权限控制的，所以直接登录进入 就行了
 
 > 根节点路径：多个环境可以共用一个zk服务，需要根节点不一样哦
 
+注意：默认支持zookeeper的版本为3.6.X；如你的zookeeper版本为3.4.x，下载的包是不一样的
+
+如需要自己改源码，可参考分支zk-3.4.x；改动pom文件 里面的版本，即可支持3.4.x
+
+```
+<!-- zookeeper -->
+<dependency>
+    <groupId>org.apache.zookeeper</groupId>
+    <artifactId>zookeeper</artifactId>
+    <version>3.4.14</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!-- curator-framework -->
+<dependency>
+    <groupId>org.apache.curator</groupId>
+    <artifactId>curator-framework</artifactId>
+    <version>2.11.1</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<!-- curator-recipes -->
+<dependency>
+    <groupId>org.apache.curator</groupId>
+    <artifactId>curator-recipes</artifactId>
+    <version>2.11.1</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+	<groupId>com.google.guava</groupId>
+	<artifactId>guava</artifactId>
+	<version>16.0.1</version>
+</dependency>
+```
+
 ## MQ管理
 
 维护不同环境的mq，此mq是对应canal server端配置的MQ；Canal Server虽然支持直连，但生产环境不推荐，推荐配合MQ同步binlog日志
